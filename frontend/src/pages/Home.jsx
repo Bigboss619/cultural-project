@@ -2,7 +2,9 @@ import React from 'react'
 import Container from '../components/layout/Container'
 const Home = () => {
   return (
-    <div>Home</div>
+    <div>
+        <Container />
+    </div>
   )
 }
 

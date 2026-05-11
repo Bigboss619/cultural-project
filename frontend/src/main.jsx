@@ -8,19 +8,23 @@ import App from './App.jsx'
 // Pages
 const Home = lazy(() => import('./pages/Home.jsx'));
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      errorElement: <ErrorBoundary />,
+      children: [{ path: '/', element: <Home /> }],
+    },
+  ],
   {
-    path: '/',
-    element: <App />,
-    errorElement: <ErrorBoundary />,
-    children: [
-      { path: '/', element: <Home /> },
-    ]
+    // IMPORTANT:
+    // If you deploy/serve the app under /cultural-project, keep basename.
+    // If you access it at the site root (e.g. http://localhost:5173/), remove basename.
+    basename: import.meta.env.BASE_URL,
   }
-], {
-  // basename: import.meta.env.BASE_URL,
-  basename: '/cultural-project/',
-});
+);
+
 
 
 createRoot(document.getElementById('root')).render(
