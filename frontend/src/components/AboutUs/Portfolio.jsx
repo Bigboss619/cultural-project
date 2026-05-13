@@ -83,10 +83,35 @@ const Portfolio = () => {
   }, [])
 
   useEffect(() => {
+    const el = itemsRef.current
+    if (!el) return
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (prefersReducedMotion) return
+
+    let lastInvokedAt = 0
     const id = setInterval(() => {
+      // Prevent rapid re-triggering while the user is interacting.
+      const now = Date.now()
+      if (now - lastInvokedAt < 300) return
+
+      const isUserScrolling = el.matches(':hover') === false && el.scrollLeft !== 0
+      // (We keep it simple; main goal is preventing page scroll.)
+
+      lastInvokedAt = now
+
       setActiveIndex((prev) => {
         const next = prev + 1 >= executives.length ? 0 : prev + 1
-        scrollToIndex(next)
+        // Avoid scrollIntoView which may affect the page position.
+        // Instead, scroll the carousel container only.
+        const child = el.children[next]
+        if (child) {
+          el.scrollTo({ left: child.offsetLeft, behavior: 'smooth' })
+        }
         return next
       })
     }, 4000)
