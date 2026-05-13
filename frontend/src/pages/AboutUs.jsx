@@ -1,9 +1,12 @@
 import React from 'react'
 import Container from '../components/layout/Container'
+import OurStory from '../components/AboutUs/OurStory'
+import CoreValues from '../components/AboutUs/CoreValues'
 const AboutUs = () => {
   return (
     <Container>
-      <div>About Us</div>
+        <OurStory />
+        <CoreValues />
     </Container>
   )
 }
