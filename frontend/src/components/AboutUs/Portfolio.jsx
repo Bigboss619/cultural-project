@@ -195,7 +195,8 @@ const Portfolio = () => {
                     <img
                       src={exec.imageSrc}
                       alt={exec.name}
-                      className='w-full h-96 md:h-[28rem] object-cover rounded-lg border border-gray-100'
+                      className='w-full aspect-square object-cover rounded-lg border border-gray-100'
+
                       loading='lazy'
                       onError={(e) => {
                         // Keep layout intact even if placeholder image isn't present.
