@@ -23,6 +23,21 @@ const Portfolio = () => {
         title: 'Treasurer',
         imageSrc: '/images/portfolio/executive-4.jpg',
       },
+      {
+        name: 'Mr. Sola Ajibola',
+        title: 'Treasurer',
+        imageSrc: '/images/portfolio/executive-4.jpg',
+      },
+      {
+        name: 'Mr. Ibuku Ajibola',
+        title: 'Treasurer',
+        imageSrc: '/images/portfolio/executive-4.jpg',
+      },
+      {
+        name: 'Engr. Sola Ajibola',
+        title: 'Treasurer',
+        imageSrc: '/images/portfolio/executive-4.jpg',
+      }
     ],
     []
   )
@@ -66,6 +81,18 @@ const Portfolio = () => {
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => el.removeEventListener('scroll', onScroll)
   }, [])
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIndex((prev) => {
+        const next = prev + 1 >= executives.length ? 0 : prev + 1
+        scrollToIndex(next)
+        return next
+      })
+    }, 4000)
+
+    return () => clearInterval(id)
+  }, [executives.length])
 
   return (
     <section className='py-20 md:py-32 bg-white'>
@@ -143,7 +170,7 @@ const Portfolio = () => {
                     <img
                       src={exec.imageSrc}
                       alt={exec.name}
-                      className='w-full h-72 object-cover rounded-lg border border-gray-100'
+                      className='w-full h-96 md:h-[28rem] object-cover rounded-lg border border-gray-100'
                       loading='lazy'
                       onError={(e) => {
                         // Keep layout intact even if placeholder image isn't present.
