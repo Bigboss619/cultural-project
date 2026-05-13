@@ -17,10 +17,10 @@ const CoreValues = () => {
                     </p>
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
                         <div className='mb-4'>
-                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style="background-color: rgba(184, 92, 60, 0.125);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-heart w-6 h-6" data-loc="client/src/components/Values.tsx:70" style="color: rgb(184, 92, 60);">
+                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(184, 92, 60, 0.125)' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-heart w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(184, 92, 60)' }}>
                                     <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
                                 </svg>
                             </div>
@@ -33,10 +33,10 @@ const CoreValues = () => {
                         </p>
                     </div>
 
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
                         <div className='mb-4'>
-                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style="background-color: rgba(212, 165, 116, 0.125);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-users w-6 h-6" data-loc="client/src/components/Values.tsx:70" style="color: rgb(212, 165, 116);">
+                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(212, 165, 116, 0.125)' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-users w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(212, 165, 116)' }}>
                                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                                 </svg>
@@ -50,10 +50,10 @@ const CoreValues = () => {
                         </p>
                     </div>
 
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
                         <div className='mb-4'>
-                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style="background-color: rgba(45, 80, 22, 0.125);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-lightbulb w-6 h-6" data-loc="client/src/components/Values.tsx:70" style="color: rgb(45, 80, 22);">
+                            <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(45, 80, 22, 0.125)' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-lightbulb w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(45, 80, 22)' }}>
                                     <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><path d="M9 18h6"></path><path d="M10 22h4"></path>
                                 </svg>
                              </div>
@@ -62,10 +62,10 @@ const CoreValues = () => {
                              <p class="font-body text-gray-600 leading-relaxed">We pursue excellence in all our endeavors, setting high standards for personal growth and collective achievement.</p>
                              </div>
 
-                    <div className="card-heritage group hover:shadow-xl transition-shadow duration-300">
+                    <div className="card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg">
                         <div className="mb-4">
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300" style="background-color: rgba(139, 111, 71, 0.125);">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-shield w-6 h-6" style="color: rgb(139, 111, 71);">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300" style={{ backgroundColor: 'rgba(139, 111, 71, 0.125)' }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-shield w-6 h-6" style={{ color: 'rgb(139, 111, 71)' }}>
                                     <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
                                 </svg>
                             </div>

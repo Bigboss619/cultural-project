@@ -7,7 +7,6 @@ import Heritage from '../components/Home/Heritage'
 import Legacy from '../components/Home/Legacy'
 const Home = () => {
   return (
-    <div>
         <Container >
           <OurStory />
           <CoreValues />
@@ -15,7 +14,6 @@ const Home = () => {
           <Legacy />
           <ContactUs /> 
         </Container>
-    </div>
   )
 }
 

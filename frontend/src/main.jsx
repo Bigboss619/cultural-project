@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorBoundary from './components/Errorhandle/ErrorBoundary';
 import './index.css'
+
 import App from './App.jsx'
 
 // Pages
