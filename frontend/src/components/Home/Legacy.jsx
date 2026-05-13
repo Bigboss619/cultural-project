@@ -29,7 +29,7 @@ const Legacy = () => {
                     <div className="text-center">
                             <div className="mb-4 flex justify-center">
                                 <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-users w-8 h-8 text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-users w-8 h-8 text-white">
                                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>
                                         <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -52,7 +52,7 @@ const Legacy = () => {
                     <div className="text-center">
                         <div className="mb-4 flex justify-center">
                                 <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-calendar w-8 h-8 text-white" >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-calendar w-8 h-8 text-white" >
                                         <path d="M8 2v4"></path>
                                         <path d="M16 2v4"></path>
                                         <rect width="18" height="18" x="3" y="4" rx="2"></rect>
@@ -74,7 +74,7 @@ const Legacy = () => {
                     <div className="text-center">
                         <div className="mb-4 flex justify-center">
                             <div className="w-16 h-16 bg-white/20 rounded-lg flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-mail w-8 h-8 text-white" >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-mail w-8 h-8 text-white" >
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                                 </svg>

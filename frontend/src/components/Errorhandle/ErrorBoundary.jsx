@@ -1,48 +1,30 @@
-import { useRouteError, Link } from "react-router-dom";
-// import { UserAuth } from "../../context/AuthContext";
+import { Link, useRouteError } from "react-router-dom";
 
 const ErrorBoundary = () => {
   const error = useRouteError();
-//   const { role } = UserAuth();
 
-//   console.error(error);
-
-//   const getDashboardPath = (role) => {
-//     switch(role) {
-//       case 'user': return '/user/dashboard';
-//       case 'admin': return '/admin/dashboard';
-//       case 'manager': return '/manager/dashboard';
-//       default: return '/manager/dashboard';
-//     }
-//   };
-
-//   if (!role) {
-//     return (
-//       <div className="h-screen flex flex-col items-center justify-center bg-gray-100 text-center">
-//         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-//         <p className="text-gray-600">Loading...</p>
-//       </div>
-//     );
-//   }
+  const message =
+    error?.statusText || error?.message || error?.toString?.() || "Unexpected error occurred";
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gray-100 text-center">
-      <h1 className="text-4xl font-bold text-red-600 mb-4">
-        Oops! Something went wrong
-      </h1>
+    <div
+      className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4"
+      role="alert"
+    >
+      <div className="max-w-xl">
+        <h1 className="text-3xl md:text-4xl font-bold text-red-600 mb-4">Something went wrong</h1>
+        <p className="text-gray-700 mb-6">{message}</p>
 
-      <p className="text-gray-600 mb-6">
-        {error?.statusText || error?.message || "Unexpected error occurred"}
-      </p>
-
-      <Link
-        to={getDashboardPath(role)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Go Back to Dashboard
-      </Link>
+        <Link
+          to="/"
+          className="inline-flex items-center justify-center rounded-md bg-[#B85C3C] text-white px-5 py-2.5 font-semibold hover:bg-[#A04A2E] transition-colors"
+        >
+          Back to Home
+        </Link>
+      </div>
     </div>
   );
 };
 
 export default ErrorBoundary;
+
