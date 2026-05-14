@@ -10,6 +10,8 @@ import App from './App.jsx'
 const Home = lazy(() => import('./pages/Home.jsx'));
 const AboutUs = lazy(() => import('./pages/AboutUs.jsx'));
 const ContactUs = lazy(() => import('./pages/ContactUs.jsx'));
+const GalleryPage = lazy(() => import('./pages/Gallery.jsx'));
+
 
 const router = createBrowserRouter(
   [
@@ -20,7 +22,9 @@ const router = createBrowserRouter(
       children: [
         { path: '/', element: <Home /> },
         { path: '/about', element: <AboutUs /> },
-        { path: '/contact', element: <ContactUs />}
+        { path: '/contact', element: <ContactUs /> },
+        { path: '/gallery', element: <GalleryPage /> }
+
       ],
     },
   ],

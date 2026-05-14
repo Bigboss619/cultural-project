@@ -1,11 +1,14 @@
 import React from 'react'
+import Gallery from '../components/Gallery/Gallery'
+import Container from '../components/layout/Container'
 
-const Gallery = () => {
+const GalleryPage = () => {
   return (
-    <div>
-        
-    </div>
+    <Container>
+      <Gallery />
+    </Container>
   )
 }
 
-export default Gallery
+export default GalleryPage
+
