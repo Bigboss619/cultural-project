@@ -1,10 +1,10 @@
 # TODO
 
-- [ ] Refactor `frontend/src/components/Events/EventLists.jsx` into a readable structure using mock data + `map()`.
-- [ ] Replace `class` with `className` and remove `data-loc` noise.
-- [x] Ensure styling remains consistent with existing Tailwind classes (manual check / build).
-- [x] Refactor `frontend/src/components/Events/SubscribeEventForm.jsx` (structure + className + remove `data-loc`).
-- [ ] Build the frontend to verify no syntax/lint issues.
-
-
+## Blog Content refactor
+- [ ] Refactor `frontend/src/components/Blog/Content.jsx`
+  - [ ] Fix invalid JSX (`class` -> `className`, remove nested `<a>`)
+  - [ ] Split into small subcomponents for readability
+  - [ ] Introduce mock `featuredPost` data model
+  - [ ] Keep the same UI/layout as current version
+- [ ] Run frontend lint/build to ensure no JSX/runtime errors
 
