@@ -1,8 +1,12 @@
 import React from 'react'
+import Container from '../components/layout/Container'
+import Content from '../components/Blog/Content'
 
 const Blog = () => {
   return (
-    <div>Blog</div>
+    <Container>
+      <Content />
+    </Container>
   )
 }
 

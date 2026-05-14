@@ -75,7 +75,7 @@ function MetaRow({ author, dateLabel, readTimeLabel }) {
 
 function FeaturedHero({ post }) {
   return (
-    <div className="container py-12 md:py-16">
+    <div className="container py-12 md:py-16 p-6">
       <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
         <div className="order-2 md:order-1">
           <img
