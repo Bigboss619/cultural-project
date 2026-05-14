@@ -16,8 +16,8 @@ const CoreValues = () => {
                         These principles guide every decision we make and every action we takes as an orgainization
                     </p>
                 </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-18'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg w-[230px] mx-auto'>
                         <div className='mb-4'>
                             <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(184, 92, 60, 0.125)' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-heart w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(184, 92, 60)' }}>
@@ -33,7 +33,7 @@ const CoreValues = () => {
                         </p>
                     </div>
 
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg w-[230px] mx-auto'>
                         <div className='mb-4'>
                             <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(212, 165, 116, 0.125)' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-users w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(212, 165, 116)' }}>
@@ -50,7 +50,7 @@ const CoreValues = () => {
                         </p>
                     </div>
 
-                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg'>
+                    <div className='card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg w-[230px] mx-auto'>
                         <div className='mb-4'>
                             <div className='w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300' style={{ backgroundColor: 'rgba(45, 80, 22, 0.125)' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" class="lucide lucide-lightbulb w-6 h-6" data-loc="client/src/components/Values.tsx:70" style={{ color: 'rgb(45, 80, 22)' }}>
@@ -62,7 +62,7 @@ const CoreValues = () => {
                              <p class="font-body text-gray-600 leading-relaxed">We pursue excellence in all our endeavors, setting high standards for personal growth and collective achievement.</p>
                              </div>
 
-                    <div className="card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg">
+                    <div className="card-heritage group hover:shadow-xl transition-shadow duration-300 rounded-lg w-[230px] mx-auto">
                         <div className="mb-4">
                             <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-colors duration-300" style={{ backgroundColor: 'rgba(139, 111, 71, 0.125)' }}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" strokelinecap="round" strokelinejoin="round" className="lucide lucide-shield w-6 h-6" style={{ color: 'rgb(139, 111, 71)' }}>

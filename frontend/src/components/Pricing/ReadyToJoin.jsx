@@ -26,7 +26,7 @@ const ReadyToJoin = ({ onApplyClick }) => {
   };
 
   return (
-    <div className="bg-gray-100 container-fluid text-center">
+    <div className="bg-gray-100 max-6xl mx-auto">
       <CTASection
         content={CTA_CONTENT}
         colors={COLORS}
@@ -35,6 +35,7 @@ const ReadyToJoin = ({ onApplyClick }) => {
     </div>
   );
 };
+
 
 // Call-to-action section component
 const CTASection = ({ content, colors, onApplyClick }) => (
