@@ -274,26 +274,28 @@ const SubscribeBox = () => {
  const Details = () => {
   return (
     <>
-      {/* Article Hero Image */}
-      <ArticleImage src={ARTICLE_DATA.image} alt={ARTICLE_DATA.title} />
+      <div className="bg-[#F3F4F6] min-h-screen flex flex-col justify-center text-center align-center">
+        {/* Article Hero Image */}
+        <ArticleImage src={ARTICLE_DATA.image} alt={ARTICLE_DATA.title} />
 
-      {/* Main Content Layout */}
-      <div className="container max-w-3xl py-12 md:py-16">
-        <div className="grid md:grid-cols-3 gap-12">
-          
-          {/* Main Article Content */}
-          <div className="md:col-span-2">
-            <ArticleContent article={ARTICLE_DATA} />
-          </div>
+        {/* Main Content Layout */}
+        <div className="container max-w-3xl py-12 md:py-16">
+          <div className="grid md:grid-cols-3 gap-12">
+            
+            {/* Main Article Content */}
+            <div className="md:col-span-2">
+              <ArticleContent article={ARTICLE_DATA} />
+            </div>
 
-          {/* Sidebar */}
-          <div className="md:col-span-1">
-            <ShareArticle />
-            <AuthorBox
-              author={ARTICLE_DATA.author}
-              bio={ARTICLE_DATA.authorBio}
-            />
-            <SubscribeBox />
+            {/* Sidebar */}
+            <div className="md:col-span-1">
+              <ShareArticle />
+              <AuthorBox
+                author={ARTICLE_DATA.author}
+                bio={ARTICLE_DATA.authorBio}
+              />
+              <SubscribeBox />
+            </div>
           </div>
         </div>
       </div>
