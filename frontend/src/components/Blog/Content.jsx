@@ -4,6 +4,7 @@ import React from 'react'
 const FEATURED_POSTS = [
   {
     id: 'heritage-festival-2025',
+    slug: 'traditional-crafts-revival',
     categoryLabel: 'Events',
     title: 'Legacy Stars Ibadan Heritage Festival 2025: A Celebration of Culture',
     excerpt:
@@ -12,7 +13,7 @@ const FEATURED_POSTS = [
     dateLabel: '1/15/2025',
     readTimeLabel: '5 min read',
     imageSrc: '/images/cultural-heritage.jpg',
-    href: '/blog/heritage-festival-2025',
+    href: '/blog-details/traditional-crafts-revival',
   },
 ]
 
