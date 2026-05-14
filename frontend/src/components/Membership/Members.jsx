@@ -6,63 +6,47 @@ const MEMBERS = [
     name: 'Tayo Adebayo',
     role: 'Cultural Curator',
     bio: 'Brings Ibadan’s oral traditions to life through storytelling circles and community exhibitions.',
-    image: {
-      label: 'TA',
-      gradientFrom: '#B85C3C',
-      gradientTo: '#1A1A1A',
-    },
+    image: { label: 'TA', gradientFrom: '#B85C3C', gradientTo: '#1A1A1A' },
   },
   {
     id: 'olakunle',
     name: 'Kolawole Olakunle',
     role: 'Youth Ambassador',
     bio: 'Leads mentorship initiatives that connect young leaders with heritage projects and volunteer drives.',
-    image: {
-      label: 'KO',
-      gradientFrom: '#D4A574',
-      gradientTo: '#B85C3C',
-    },
+    image: { label: 'KO', gradientFrom: '#D4A574', gradientTo: '#B85C3C' },
   },
   {
     id: 'babatunde',
     name: 'Aminat Babatunde',
     role: 'Community Liaison',
     bio: 'Builds bridges across neighborhoods—coordinating events that celebrate culture, unity, and pride.',
-    image: {
-      label: 'AB',
-      gradientFrom: '#1A1A1A',
-      gradientTo: '#B85C3C',
-    },
+    image: { label: 'AB', gradientFrom: '#1A1A1A', gradientTo: '#B85C3C' },
   },
   {
     id: 'adebisi',
     name: 'Segun Adebisi',
     role: 'Heritage Coordinator',
     bio: 'Organizes preservation efforts and heritage walks to keep history visible for future generations.',
-    image: {
-      label: 'SA',
-      gradientFrom: '#8B4423',
-      gradientTo: '#D4A574',
-    },
+    image: { label: 'SA', gradientFrom: '#8B4423', gradientTo: '#D4A574' },
   },
   {
     id: 'oshun',
     name: 'Kemi Oshun',
     role: 'Arts & Performance Lead',
     bio: 'Supports dance, drumming, and stagecraft—helping performers share authentic Ibadan expressions.',
-    image: {
-      label: 'KO',
-      gradientFrom: '#B85C3C',
-      gradientTo: '#D4A574',
-    },
+    image: { label: 'KO', gradientFrom: '#B85C3C', gradientTo: '#D4A574' },
   },
 ]
 
+function Avatar({ image, size = 'lg' }) {
+  const sizeClasses =
+    size === 'sm'
+      ? 'w-14 h-14'
+      : 'w-20 h-20'
 
-function Avatar({ image }) {
   return (
     <div
-      className="w-20 h-20 rounded-full flex items-center justify-center shadow-md"
+      className={`${sizeClasses} rounded-full flex items-center justify-center shadow-md`}
       style={{
         backgroundImage: `linear-gradient(135deg, ${image.gradientFrom}, ${image.gradientTo})`,
       }}
@@ -74,12 +58,8 @@ function Avatar({ image }) {
     </div>
   )
 }
-
-
-
 const Members = () => {
   const members = useMemo(() => MEMBERS, [])
-  
 
   return (
     <main>
@@ -107,15 +87,11 @@ const Members = () => {
                     <h3 className="font-display text-xl font-bold text-[#1A1A1A] truncate">
                       {m.name}
                     </h3>
-                    <p className="font-body text-[#B85C3C] font-semibold">
-                      {m.role}
-                    </p>
+                    <p className="font-body text-[#B85C3C] font-semibold">{m.role}</p>
                   </div>
                 </div>
 
-                <p className="font-body text-gray-700 mt-4 leading-relaxed">
-                  {m.bio}
-                </p>
+                <p className="font-body text-gray-700 mt-4 leading-relaxed">{m.bio}</p>
               </div>
 
               <div className="h-1 w-full bg-gradient-to-r from-[#B85C3C] via-[#D4A574] to-[#E0D5C7]" aria-hidden="true" />
