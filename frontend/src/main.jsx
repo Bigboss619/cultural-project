@@ -9,6 +9,7 @@ import App from './App.jsx'
 // Pages
 const Home = lazy(() => import('./pages/Home.jsx'));
 const AboutUs = lazy(() => import('./pages/AboutUs.jsx'));
+const ContactUs = lazy(() => import('./pages/ContactUs.jsx'));
 
 const router = createBrowserRouter(
   [
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
       children: [
         { path: '/', element: <Home /> },
         { path: '/about', element: <AboutUs /> },
+        { path: '/contact', element: <ContactUs />}
       ],
     },
   ],
