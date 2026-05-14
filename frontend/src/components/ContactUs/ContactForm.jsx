@@ -115,8 +115,8 @@ function SocialLink({ label, href, icon }) {
 
 const ContactForm = () => {
   return (
-    <div className="container py-12 md:py-16 md:p-12">
-      <div className="grid md:grid-cols-2 gap-12 ">
+    <div className="container py-12 md:py-16 md:p-12 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
         <ContactMessageForm />
 
         <div className="space-y-8">
