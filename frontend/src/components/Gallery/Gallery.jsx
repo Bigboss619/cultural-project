@@ -77,8 +77,8 @@ function GalleryCard({ category, title }) {
 
 const Gallery = () => {
   return (
-    <section className="container py-12 md:py-16">
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section className="container py-12 md:py-16 md:p-12 max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12">
         {GALLERY_ITEMS.map((item) => (
           <GalleryCard key={item.id} category={item.category} title={item.title} />
         ))}
