@@ -133,44 +133,44 @@ function EventMetaRow({ icon, label, value }) {
 
 function EventCard({ event }) {
   return (
-    <article className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border-l-4 border-[#B85C3C]">
-      <div className="p-6 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-          <div>
-            <span className="inline-block px-3 py-1 bg-[#F0EBE3] text-[#B85C3C] text-xs font-semibold rounded mb-3">
-              {event.category}
-            </span>
-            <h3 className="text-2xl font-display font-bold text-[#1A1A1A]">{event.title}</h3>
+      <article className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border-l-4 border-[#B85C3C]">
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+              <span className="inline-block px-3 py-1 bg-[#F0EBE3] text-[#B85C3C] text-xs font-semibold rounded mb-3">
+                {event.category}
+              </span>
+              <h3 className="text-2xl font-display font-bold text-[#1A1A1A]">{event.title}</h3>
+            </div>
+
+            <button className="px-6 py-2 bg-[#B85C3C] text-white font-semibold rounded-lg hover:bg-[#A04A2E] transition-colors duration-300 whitespace-nowrap">
+              {event.ctaLabel}
+            </button>
           </div>
 
-          <button className="px-6 py-2 bg-[#B85C3C] text-white font-semibold rounded-lg hover:bg-[#A04A2E] transition-colors duration-300 whitespace-nowrap">
-            {event.ctaLabel}
-          </button>
+          <div className="grid md:grid-cols-3 gap-4 text-gray-600">
+            <EventMetaRow
+              icon={<CalendarIcon />}
+              label={event.dateLabel}
+              value={event.dateValue}
+            />
+            <EventMetaRow icon={<ClockIcon />} label={event.timeLabel} value={event.timeValue} />
+            <EventMetaRow
+              icon={<MapPinIcon />}
+              label={event.locationLabel}
+              value={event.locationValue}
+            />
+          </div>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-4 text-gray-600">
-          <EventMetaRow
-            icon={<CalendarIcon />}
-            label={event.dateLabel}
-            value={event.dateValue}
-          />
-          <EventMetaRow icon={<ClockIcon />} label={event.timeLabel} value={event.timeValue} />
-          <EventMetaRow
-            icon={<MapPinIcon />}
-            label={event.locationLabel}
-            value={event.locationValue}
-          />
-        </div>
-      </div>
-    </article>
+      </article>
   )
 }
 
 const EventLists = () => {
   return (
     <section>
-      <div className="container py-12 md:py-16">
-        <div className="space-y-6">
+      <div className="container py-12 md:py-16 max-w-6xl p-6 md:p-12">
+        <div className="space-y-8">
           {EVENTS_MOCK.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
