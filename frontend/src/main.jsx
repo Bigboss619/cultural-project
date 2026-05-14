@@ -11,6 +11,7 @@ const Home = lazy(() => import('./pages/Home.jsx'));
 const AboutUs = lazy(() => import('./pages/AboutUs.jsx'));
 const ContactUs = lazy(() => import('./pages/ContactUs.jsx'));
 const GalleryPage = lazy(() => import('./pages/Gallery.jsx'));
+const Events = lazy(() => import('./pages/Events.jsx'));
 
 
 const router = createBrowserRouter(
@@ -23,8 +24,8 @@ const router = createBrowserRouter(
         { path: '/', element: <Home /> },
         { path: '/about', element: <AboutUs /> },
         { path: '/contact', element: <ContactUs /> },
-        { path: '/gallery', element: <GalleryPage /> }
-
+        { path: '/gallery', element: <GalleryPage /> },
+        { path: '/events', element: <Events /> }
       ],
     },
   ],

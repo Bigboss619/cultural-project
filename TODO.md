@@ -1,10 +1,10 @@
 # TODO
 
-- [x] Refactor `frontend/src/components/Gallery/Gallery.jsx` with mock data, map rendering, and better structure
-- [x] Fix React attribute issues (`class` -> `className`) in Gallery component
-- [x] Wire `frontend/src/pages/Gallery.jsx` to render the Gallery component
-- [x] Update `frontend/src/main.jsx` to add a `/gallery` route (lazy-loaded)
-- [ ] Run frontend build/dev checks (lint/test if available)
+- [ ] Refactor `frontend/src/components/Events/EventLists.jsx` into a readable structure using mock data + `map()`.
+- [ ] Replace `class` with `className` and remove `data-loc` noise.
+- [x] Ensure styling remains consistent with existing Tailwind classes (manual check / build).
+- [x] Refactor `frontend/src/components/Events/SubscribeEventForm.jsx` (structure + className + remove `data-loc`).
+- [ ] Build the frontend to verify no syntax/lint issues.
 
 
 
