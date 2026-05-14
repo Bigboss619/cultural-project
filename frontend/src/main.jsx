@@ -17,6 +17,7 @@ const Blog = lazy(() => import('./pages/Blog.jsx'));
 const BlogDetails = lazy(() => import('./pages/BlogDetails.jsx'));
 const Membership = lazy(() => import('./pages/Membership.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
+const Login = lazy(() => import('./pages/Login.jsx'));
 
 
 const router = createBrowserRouter(
@@ -34,7 +35,8 @@ const router = createBrowserRouter(
         { path: '/blog', element: <Blog />},
         { path: '/blog/:slug', element: <BlogDetails /> },
         { path: '/membership', element: <Membership />},
-        { path: '/pricing', element: <Pricing />}
+        { path: '/pricing', element: <Pricing />},
+        { path: '/login', element: <Login /> }
       ],
     },
   ],

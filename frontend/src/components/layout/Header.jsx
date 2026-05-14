@@ -76,7 +76,9 @@ const Header = () => {
               e.target.style.backgroundColor = COLORS.buttonBg;
             }}
           >
+            <Link to="/login" >
             Login
+            </Link>
           </button>
 
           {/* Hamburger Menu (Mobile Only) */}
