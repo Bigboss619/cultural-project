@@ -271,10 +271,10 @@ const SubscribeBox = () => {
 // ============================================
 // MAIN COMPONENT
 // ============================================
- const Details = () => {
+const Details = () => {
   return (
     <>
-      <div className="bg-[#F3F4F6] min-h-screen flex flex-col justify-center text-center align-center">
+      <div className="bg-[#F3F4F6] min-h-screen flex flex-col justify-center items-center text-center">
         {/* Article Hero Image */}
         <ArticleImage src={ARTICLE_DATA.image} alt={ARTICLE_DATA.title} />
 
