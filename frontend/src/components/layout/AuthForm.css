@@ -1,0 +1,103 @@
+/* Auth Form Container */
+.auth-form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Toggle Buttons */
+.auth-toggle-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: #f0f0f0;
+  border-radius: 12px;
+  padding: 5px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #D4A574;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover:not(.active) {
+  color: #333;
+}
+
+/* Flip Container */
+.flip-container {
+  perspective: 1000px;
+  width: 100%;
+  height: auto;
+  position: relative;
+  min-height: 400px;
+}
+
+.flip-front,
+.flip-back {
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: all 0.6s ease;
+  transform-origin: center;
+}
+
+.flip-front {
+  transform: rotateY(0deg);
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Flipped state */
+.flip-container.flipped .flip-front {
+  transform: rotateY(-180deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flip-container.flipped .flip-back {
+  transform: rotateY(0deg);
+  position: relative;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-form-container {
+    padding: 15px;
+  }
+
+  .auth-toggle-buttons {
+    margin-bottom: 20px;
+  }
+
+  .toggle-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .flip-container {
+    min-height: 350px;
+  }
+}

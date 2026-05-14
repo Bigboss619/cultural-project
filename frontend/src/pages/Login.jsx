@@ -1,11 +1,11 @@
 import React from 'react'
-import SignIn from '../components/Login/SignIn.jsx';
+import AuthPage from '../components/layout/AuthForm.jsx';
 import Container from '../components/layout/Container.jsx';
 
 const Login = () => {
   return (
     <Container>
-      <SignIn />
+      <AuthPage />
     </Container>
   )
 }
