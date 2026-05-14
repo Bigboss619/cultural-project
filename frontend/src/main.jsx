@@ -13,6 +13,7 @@ const ContactUs = lazy(() => import('./pages/ContactUs.jsx'));
 const GalleryPage = lazy(() => import('./pages/Gallery.jsx'));
 const Events = lazy(() => import('./pages/Events.jsx'));
 const Blog = lazy(() => import('./pages/Blog.jsx'));
+const BlogDetails = lazy(() => import('./components/Blog/BlogDetails.jsx'));
 
 const router = createBrowserRouter(
   [
@@ -26,7 +27,8 @@ const router = createBrowserRouter(
         { path: '/contact', element: <ContactUs /> },
         { path: '/gallery', element: <GalleryPage /> },
         { path: '/events', element: <Events /> },
-        { path: '/blog', element: <Blog />}
+        { path: '/blog', element: <Blog />},
+        { path: '/blog/:slug', element: <BlogDetails /> },
       ],
     },
   ],
