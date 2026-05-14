@@ -13,7 +13,7 @@ const FEATURED_POSTS = [
     dateLabel: '1/15/2025',
     readTimeLabel: '5 min read',
     imageSrc: '/images/cultural-heritage.jpg',
-    href: '/blog-details/traditional-crafts-revival',
+    href: '/blog/traditional-crafts-revival',
   },
 ]
 

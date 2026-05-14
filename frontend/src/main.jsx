@@ -14,7 +14,7 @@ const GalleryPage = lazy(() => import('./pages/Gallery.jsx'));
 const Events = lazy(() => import('./pages/Events.jsx'));
 const Blog = lazy(() => import('./pages/Blog.jsx'));
 // const BlogDetails = lazy(() => import('./components/Blog/BlogDetails.jsx'));
-const BlogDetails = lazy(() => import('./components/Blog/BlogDetails.jsx').then(m => ({ default: m.BlogDetails })));
+const BlogDetails = lazy(() => import('./pages/BlogDetails.jsx').then(m => ({ default: m.BlogDetails })));
 
 const router = createBrowserRouter(
   [

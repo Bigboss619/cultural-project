@@ -271,8 +271,7 @@ const SubscribeBox = () => {
 // ============================================
 // MAIN COMPONENT
 // ============================================
-
-export const BlogDetails = () => {
+ const Details = () => {
   return (
     <>
       {/* Article Hero Image */}
@@ -301,3 +300,4 @@ export const BlogDetails = () => {
     </>
   );
 }
+export default Details;
