@@ -43,9 +43,10 @@
 .flip-container {
   perspective: 1000px;
   width: 100%;
+  /* Reserve enough vertical space for the taller signup form (prevents footer overlap). */
+  min-height: 700px;
   height: auto;
   position: relative;
-  min-height: 400px;
 }
 
 .flip-front,
@@ -77,7 +78,7 @@
 
 .flip-container.flipped .flip-back {
   transform: rotateY(0deg);
-  position: relative;
+  /* Keep absolute positioning to prevent the form from reflowing/jumping */
   opacity: 1;
   pointer-events: auto;
 }
