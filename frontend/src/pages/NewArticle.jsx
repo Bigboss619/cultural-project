@@ -100,11 +100,15 @@ const NewArticle = () => {
 
 
   useEffect(() => {
+    // Editors can briefly be null during refresh/hydration; guard before calling commands.
     if (!summaryEditor || !contentEditor) return;
+    if (!summaryEditor.commands || !contentEditor.commands) return;
+
     // when switching editId/mode, replace doc
     summaryEditor.commands.setContent(summaryInitialHtml);
     contentEditor.commands.setContent(contentInitialHtml);
   }, [summaryEditor, contentEditor, summaryInitialHtml, contentInitialHtml]);
+
 
   const onCancel = () => {
     navigate('/admin/posts');
