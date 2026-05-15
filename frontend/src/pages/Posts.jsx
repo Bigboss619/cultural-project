@@ -1,24 +1,25 @@
 import React, { useMemo, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import {
-  FeaturedPostsPanel,
-  PostsFeatures,
-  PostsList,
-  PostsToolbar,
-} from '../components/Post';
+import { FeaturedPostsPanel, PostsFeatures, PostsList, PostsToolbar } from '../components/Post';
+
 import { INITIAL_FEATURES, INITIAL_POSTS } from '../components/Post/mockPostsData';
+import { PostEditorModal } from '../components/Post';
 import { useNavigate } from 'react-router-dom';
 
 const Posts = () => {
-  const [articles, setArticles] = useState(INITIAL_POSTS);
+  const [articles] = useState(INITIAL_POSTS);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('create');
+  const [editId, setEditId] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
+
   const [filter, setFilter] = useState('all'); // all | published | draft
 
   const navigate = useNavigate();
 
-
-
   const filteredArticles = useMemo(() => {
+
     const q = searchQuery.trim().toLowerCase();
 
     let next = articles;
@@ -49,16 +50,14 @@ const Posts = () => {
   }, [articles]);
 
   const openCreate = () => {
-    setModalMode('create');
-    setEditId(null);
-    setIsModalOpen(true);
+    navigate('/admin/posts/new');
   };
 
+
   const openEdit = (article) => {
-    setModalMode('edit');
-    setEditId(article.id);
-    setIsModalOpen(true);
+    navigate(`/admin/posts/edit/${article.id}`);
   };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
