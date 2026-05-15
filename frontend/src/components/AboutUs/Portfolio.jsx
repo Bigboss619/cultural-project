@@ -4,38 +4,28 @@ const Portfolio = () => {
   const executives = useMemo(
     () => [
       {
-        name: 'Alhaji Femi Adebayo',
-        title: 'Chairman',
+        name: 'Legacy - Mogaji Abayomi Gbadamosi',
+        title: 'President',
         imageSrc: '/images/portfolio/executive-1.jpg',
       },
       {
-        name: 'Chief (Mrs.) Kehinde Olayemi',
-        title: 'Secretary',
+        name: 'Legacy Alhaji Akeem Hussein',
+        title: 'Vice President',
         imageSrc: '/images/portfolio/executive-2.jpg',
       },
       {
-        name: 'Dr. Tunde Adewale',
-        title: 'Coordinator',
+        name: 'Legacy - Folarin Saheed',
+        title: 'General Secretary',
         imageSrc: '/images/portfolio/executive-3.jpg',
       },
       {
-        name: 'Engr. Sola Ajibola',
-        title: 'Treasurer',
+        name: 'Legacy - Adekunle Safiu',
+        title: 'Director of Finance',
         imageSrc: '/images/portfolio/executive-4.jpg',
       },
       {
-        name: 'Mr. Sola Ajibola',
-        title: 'Treasurer',
-        imageSrc: '/images/portfolio/executive-4.jpg',
-      },
-      {
-        name: 'Mr. Ibuku Ajibola',
-        title: 'Treasurer',
-        imageSrc: '/images/portfolio/executive-4.jpg',
-      },
-      {
-        name: 'Engr. Sola Ajibola',
-        title: 'Treasurer',
+        name: 'Legacy - Bukunmi Olugbade',
+        title: 'Director of Socials',
         imageSrc: '/images/portfolio/executive-4.jpg',
       }
     ],
