@@ -77,10 +77,12 @@ const NewArticle = () => {
     setContentInitialHtml(contentHtml);
   }, [mode, editing, categories]);
 
+  // StarterKit already includes underline in this build, so we avoid adding it twice.
   const extensions = useMemo(
-    () => [StarterKit, Underline, TextAlign.configure({ types: ['heading', 'paragraph'] })],
+    () => [StarterKit, TextAlign.configure({ types: ['heading', 'paragraph'] })],
     []
   );
+
 
   const summaryEditor = useEditor({
     extensions,
