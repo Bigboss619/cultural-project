@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Pencil, Trash2, Upload } from 'lucide-react';
+
 
 const statusBadge = (status) => {
   if (status === 'published') {
@@ -90,13 +90,6 @@ const PostsList = ({
   );
 };
 
-PostsList.propTypes = {
-  posts: PropTypes.arrayOf(PropTypes.object).isRequired,
-  filter: PropTypes.oneOf(['all', 'published', 'draft']).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onPublish: PropTypes.func.isRequired,
-};
-
 export default PostsList;
+
 

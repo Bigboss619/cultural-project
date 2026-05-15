@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import PropTypes from 'prop-types';
+
 
 const normalize = (s) => (s == null ? '' : String(s));
 
@@ -167,13 +167,6 @@ const PostEditorModal = ({
   );
 };
 
-PostEditorModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  mode: PropTypes.oneOf(['create', 'edit']).isRequired,
-  initialData: PropTypes.object,
-  onClose: PropTypes.func.isRequired,
-  onSave: PropTypes.func.isRequired,
-};
-
 export default PostEditorModal;
+
 

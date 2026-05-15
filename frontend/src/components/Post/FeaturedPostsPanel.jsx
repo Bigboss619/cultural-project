@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 
 const FeaturedPostsPanel = ({ posts, onEdit }) => {
   return (
@@ -46,17 +46,6 @@ const FeaturedPostsPanel = ({ posts, onEdit }) => {
   );
 };
 
-FeaturedPostsPanel.propTypes = {
-  posts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      category: PropTypes.string,
-      summary: PropTypes.string,
-    })
-  ).isRequired,
-  onEdit: PropTypes.func.isRequired,
-};
-
 export default FeaturedPostsPanel;
+
 

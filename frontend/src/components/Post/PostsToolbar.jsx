@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Plus, Search } from 'lucide-react';
+
 
 const PostsToolbar = ({ searchQuery, onSearchQueryChange, onCreateClick }) => {
   return (
@@ -27,11 +27,6 @@ const PostsToolbar = ({ searchQuery, onSearchQueryChange, onCreateClick }) => {
   );
 };
 
-PostsToolbar.propTypes = {
-  searchQuery: PropTypes.string.isRequired,
-  onSearchQueryChange: PropTypes.func.isRequired,
-  onCreateClick: PropTypes.func.isRequired,
-};
-
 export default PostsToolbar;
+
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
 
 const PostsFeatures = ({ features }) => {
   return (
@@ -20,15 +20,6 @@ const PostsFeatures = ({ features }) => {
   );
 };
 
-PostsFeatures.propTypes = {
-  features: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      description: PropTypes.string,
-    })
-  ).isRequired,
-};
-
 export default PostsFeatures;
+
 
