@@ -1,316 +1,126 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import { Search, UserPlus, Shield } from 'lucide-react';
-
-import ManageHeader from '../components/AdminUsers/ManageHeader';
-import ManageTabs from '../components/AdminUsers/ManageTabs';
-import UsersTable from '../components/AdminUsers/UsersTable';
-import UserActionsPanel from '../components/AdminUsers/UserActionsPanel';
-
-import { mockRoleGroups, mockFeatures } from '../components/AdminUsers/mockUserData';
-
-const roleToTab = (role) => {
-  if (role === 'Admin') return 'Admins';
-  if (role === 'Editor') return 'Editors';
-  if (role === 'Member') return 'Members';
-  return 'Guests';
-};
-
-const tabToRole = (tab) => {
-  if (tab === 'Admins') return 'Admin';
-  if (tab === 'Editors') return 'Editor';
-  if (tab === 'Members') return 'Member';
-  return 'Guest';
-};
+import { Edit2, Trash2, Lock, Shield } from 'lucide-react';
+import UserHeader from '../components/AdminUsers/UserHeader';
+import UserSearchBar from '../components/AdminUsers/UserSearchBar';
+import UserTable from '../components/AdminUsers/UserTable';
+import EditUserModal from '../components/AdminUsers/EditUserModal';
+import DeleteUserModal from '../components/AdminUsers/DeleteUserModal';
+import SuspendAccountModal from '../components/AdminUsers/SuspendAccountModal';
+import AssignRolesModal from '../components/AdminUsers/AssignRolesModal';
 
 const Users = () => {
-  const [activeTab, setActiveTab] = React.useState('Admins');
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [users, setUsers] = useState([
+    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
+    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Moderator', status: 'Inactive' },
+  ]);
 
-  // Local mock state
-  const [roleGroups, setRoleGroups] = React.useState(() => structuredClone(mockRoleGroups));
-  const [selectedUser, setSelectedUser] = React.useState(null);
-  const [toast, setToast] = React.useState(null);
+  // Modal states
+  const [editModal, setEditModal] = useState({ isOpen: false, user: null });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, user: null });
+  const [suspendModal, setSuspendModal] = useState({ isOpen: false, user: null });
+  const [rolesModal, setRolesModal] = useState({ isOpen: false, user: null });
 
-  const showToast = (message) => {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2200);
+  // Action handlers
+  const handleEditUser = (user) => {
+    setEditModal({ isOpen: true, user });
   };
 
-  const allUsers = React.useMemo(() => {
-    return Object.values(roleGroups).flat();
-  }, [roleGroups]);
-
-  const filteredUsersForTab = React.useMemo(() => {
-    if (activeTab === 'Features') return [];
-    const base = roleGroups[activeTab] || [];
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return base;
-    return base.filter((u) => {
-      return (
-        u.name.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q) ||
-        u.role.toLowerCase().includes(q) ||
-        u.status.toLowerCase().includes(q)
-      );
-    });
-  }, [activeTab, roleGroups, searchQuery]);
-
-  const handleEdit = (user) => {
-    setSelectedUser(user);
-    showToast(`Mock: Editing ${user.name}`);
+  const handleSaveEdit = (updatedUser) => {
+    setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
+    setEditModal({ isOpen: false, user: null });
   };
 
-  const handleDelete = (user) => {
-    setSelectedUser(user);
-    // Mock delete: remove from roleGroups
-    setRoleGroups((prev) => {
-      const next = structuredClone(prev);
-      const tab = roleToTab(user.role);
-      next[tab] = (next[tab] || []).filter((u) => u.id !== user.id);
-      return next;
-    });
-    showToast(`Mock: Deleted ${user.name}`);
+  const handleDeleteUser = (user) => {
+    setDeleteModal({ isOpen: true, user });
   };
 
-  const handleSuspend = (user) => {
-    setSelectedUser(user);
-    setRoleGroups((prev) => {
-      const next = structuredClone(prev);
-      const tab = roleToTab(user.role);
-      next[tab] = (next[tab] || []).map((u) =>
-        u.id === user.id ? { ...u, status: u.status === 'Suspended' ? 'Active' : 'Suspended' } : u
-      );
-      return next;
-    });
-    showToast(`Mock: Toggled suspension for ${user.name}`);
+  const handleConfirmDelete = () => {
+    setUsers(users.filter(u => u.id !== deleteModal.user.id));
+    setDeleteModal({ isOpen: false, user: null });
+  };
+
+  const handleSuspendAccount = (user) => {
+    setSuspendModal({ isOpen: true, user });
+  };
+
+  const handleConfirmSuspend = (reason) => {
+    setUsers(users.map(u => 
+      u.id === suspendModal.user.id 
+        ? { ...u, status: 'Suspended', suspendReason: reason }
+        : u
+    ));
+    setSuspendModal({ isOpen: false, user: null });
   };
 
   const handleAssignRoles = (user) => {
-    setSelectedUser(user);
-    // Mock assign roles: cycle role tab
-    setRoleGroups((prev) => {
-      const next = structuredClone(prev);
-      const order = ['Admins', 'Editors', 'Members', 'Guests'];
-      const currentTab = roleToTab(user.role);
-      const idx = order.indexOf(currentTab);
-      const newTab = order[(idx + 1) % order.length];
-
-      // Remove from old tab
-      next[currentTab] = (next[currentTab] || []).filter((u) => u.id !== user.id);
-      // Add to new tab
-      const updatedUser = { ...user, role: tabToRole(newTab), status: user.status };
-      next[newTab] = [...(next[newTab] || []), updatedUser];
-      return next;
-    });
-    showToast(`Mock: Assigned new role for ${user.name}`);
+    setRolesModal({ isOpen: true, user });
   };
 
-  const handleAdd = () => {
-    // Mock add: add to active tab (role)
-    const newId = `u-${Math.floor(Math.random() * 9000) + 1000}`;
-    const tab = activeTab === 'Features' ? 'Members' : activeTab;
-    const role = tabToRole(tab);
-
-    const newUser = {
-      id: newId,
-      name: 'New User',
-      email: `new${newId}@example.com`,
-      role,
-      status: 'Active',
-    };
-
-    setRoleGroups((prev) => {
-      const next = structuredClone(prev);
-      next[tab] = [...(next[tab] || []), newUser];
-      return next;
-    });
-
-    showToast(`Mock: Added ${newUser.name}`);
+  const handleSaveRoles = (userId, newRoles) => {
+    setUsers(users.map(u => 
+      u.id === userId 
+        ? { ...u, role: newRoles }
+        : u
+    ));
+    setRolesModal({ isOpen: false, user: null });
   };
 
-  // Actions panel uses selectedUser
-  const selectedUserExists = Boolean(selectedUser);
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const handleEditSelected = () => {
-    if (!selectedUser) return;
-    handleEdit(selectedUser);
-  };
-
-  const handleDeleteSelected = () => {
-    if (!selectedUser) return;
-    handleDelete(selectedUser);
-    setSelectedUser(null);
-  };
-
-  const handleSuspendSelected = () => {
-    if (!selectedUser) return;
-    handleSuspend(selectedUser);
-  };
-
-  const handleAssignRolesSelected = () => {
-    if (!selectedUser) return;
-    handleAssignRoles(selectedUser);
-  };
+  const actions = [
+    { icon: Edit2, label: 'Edit', handler: handleEditUser, color: 'blue' },
+    { icon: Shield, label: 'Assign Roles', handler: handleAssignRoles, color: 'purple' },
+    { icon: Lock, label: 'Suspend', handler: handleSuspendAccount, color: 'yellow' },
+    { icon: Trash2, label: 'Delete', handler: handleDeleteUser, color: 'red' },
+  ];
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <ManageHeader />
+        <UserHeader />
+        <UserSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <UserTable 
+          users={filteredUsers} 
+          actions={actions}
+        />
 
-        {/* Search */}
-        {activeTab !== 'Features' && (
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder={`Search ${activeTab.toLowerCase()}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-        )}
+        {/* Modals */}
+        <EditUserModal
+          isOpen={editModal.isOpen}
+          user={editModal.user}
+          onClose={() => setEditModal({ isOpen: false, user: null })}
+          onSave={handleSaveEdit}
+        />
 
-        <ManageTabs activeTab={activeTab} onChange={setActiveTab} />
+        <DeleteUserModal
+          isOpen={deleteModal.isOpen}
+          user={deleteModal.user}
+          onClose={() => setDeleteModal({ isOpen: false, user: null })}
+          onConfirm={handleConfirmDelete}
+        />
 
-        {toast && (
-          <div className="fixed top-4 right-4 z-50">
-            <div className="px-4 py-3 rounded-lg bg-slate-900 text-white shadow-lg text-sm">{toast}</div>
-          </div>
-        )}
+        <SuspendAccountModal
+          isOpen={suspendModal.isOpen}
+          user={suspendModal.user}
+          onClose={() => setSuspendModal({ isOpen: false, user: null })}
+          onConfirm={handleConfirmSuspend}
+        />
 
-        {activeTab === 'Features' ? (
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="p-6 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                <h2 className="text-xl font-bold flex items-center gap-2 mb-2">
-                  <Shield size={18} /> Features
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Mock feature list for user administration.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {mockFeatures.map((f) => (
-                  <div
-                    key={f.id}
-                    className="p-5 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-semibold">{f.label}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{f.description}</p>
-                      </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium self-start ${
-                          f.status === 'Enabled'
-                            ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                            : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        {f.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-6 rounded-lg bg-blue-50 dark:bg-slate-900/50 border border-blue-200 dark:border-slate-700">
-                <div className="flex items-center gap-2">
-                  <UserPlus size={18} className="text-blue-700 dark:text-blue-300" />
-                  <h3 className="font-bold">Try the actions</h3>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  Switch back to Admins/Editors/Members/Guests to manage mock users.
-                </p>
-              </div>
-              <div className="opacity-70">
-                <UserActionsPanel
-                  onAdd={handleAdd}
-                  onEdit={handleEditSelected}
-                  onDelete={handleDeleteSelected}
-                  onSuspend={handleSuspendSelected}
-                  onAssignRoles={handleAssignRolesSelected}
-                  disabled={!selectedUserExists}
-                />
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-bold">{activeTab}</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mt-1">
-                    {filteredUsersForTab.length} user(s) in this group.
-                  </p>
-                </div>
-              </div>
-
-              <UsersTable
-                users={filteredUsersForTab}
-                onEdit={(u) => {
-                  setSelectedUser(u);
-                  handleEdit(u);
-                }}
-                onDelete={(u) => {
-                  setSelectedUser(u);
-                  handleDelete(u);
-                  setSelectedUser(null);
-                }}
-                onSuspend={(u) => {
-                  setSelectedUser(u);
-                  handleSuspend(u);
-                }}
-                onAssignRoles={(u) => {
-                  setSelectedUser(u);
-                  handleAssignRoles(u);
-                }}
-              />
-
-              <div className="text-xs text-gray-600 dark:text-gray-400">
-                Showing {filteredUsersForTab.length} of {roleGroups[activeTab]?.length || 0} user(s).
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <UserActionsPanel
-                onAdd={handleAdd}
-                onEdit={handleEditSelected}
-                onDelete={handleDeleteSelected}
-                onSuspend={handleSuspendSelected}
-                onAssignRoles={handleAssignRolesSelected}
-                disabled={!selectedUserExists}
-              />
-
-              <div className="p-6 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-                <h3 className="text-lg font-bold mb-2">Quick Summary</h3>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  {['Admins', 'Editors', 'Members', 'Guests'].map((tab) => (
-                    <div key={tab} className="p-3 rounded-lg bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700">
-                      <div className="font-semibold">{tab}</div>
-                      <div className="text-gray-600 dark:text-gray-400">{roleGroups[tab]?.length || 0} users</div>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
-                  Total: {allUsers.length}
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
+        <AssignRolesModal
+          isOpen={rolesModal.isOpen}
+          user={rolesModal.user}
+          onClose={() => setRolesModal({ isOpen: false, user: null })}
+          onSave={handleSaveRoles}
+        />
       </div>
     </AdminLayout>
   );
 };
 
 export default Users;
-
