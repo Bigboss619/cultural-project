@@ -2,21 +2,21 @@ import React, { useMemo, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import {
   FeaturedPostsPanel,
-  PostEditorModal,
   PostsFeatures,
   PostsList,
   PostsToolbar,
 } from '../components/Post';
 import { INITIAL_FEATURES, INITIAL_POSTS } from '../components/Post/mockPostsData';
+import { useNavigate } from 'react-router-dom';
 
 const Posts = () => {
   const [articles, setArticles] = useState(INITIAL_POSTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all'); // all | published | draft
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState('create'); // create | edit
-  const [editId, setEditId] = useState(null);
+  const navigate = useNavigate();
+
+
 
   const filteredArticles = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();

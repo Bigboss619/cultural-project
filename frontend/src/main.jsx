@@ -6,6 +6,11 @@ import './index.css'
 
 import App from './App.jsx'
 
+// Admin New Article (Tiptap page)
+const NewArticlePage = lazy(() => import('./pages/NewArticle.jsx'));
+
+
+
 // Pages
 const Home = lazy(() => import('./pages/Home.jsx'));
 const AboutUs = lazy(() => import('./pages/AboutUs.jsx'));
@@ -56,6 +61,9 @@ const router = createBrowserRouter(
           { path: '/admin/users', element: <AdminUsers /> },
           { path: '/admin/categories', element: <AdminCategories /> },
           { path: '/admin/posts', element: <AdminPosts /> },
+          { path: '/admin/posts/new', element: <NewArticlePage /> },
+          { path: '/admin/posts/:mode/:id', element: <NewArticlePage /> },
+
           { path: '/admin/events', element: <AdminEvents /> },
           { path: '/admin/gallery', element: <AdminGallery /> },
           { path: '/admin/videos', element: <AdminVideos /> },
