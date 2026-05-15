@@ -77,19 +77,25 @@ const NewArticle = () => {
     setContentInitialHtml(contentHtml);
   }, [mode, editing, categories]);
 
+  const extensions = useMemo(
+    () => [StarterKit, Underline, TextAlign.configure({ types: ['heading', 'paragraph'] })],
+    []
+  );
+
   const summaryEditor = useEditor({
-    extensions: [StarterKit, Underline, TextAlign.configure({ types: ['heading', 'paragraph'] })],
+    extensions,
     content: summaryInitialHtml,
     autofocus: false,
     editable: true,
   });
 
   const contentEditor = useEditor({
-    extensions: [StarterKit, Underline, TextAlign.configure({ types: ['heading', 'paragraph'] })],
+    extensions,
     content: contentInitialHtml,
     autofocus: false,
     editable: true,
   });
+
 
   useEffect(() => {
     if (!summaryEditor || !contentEditor) return;
