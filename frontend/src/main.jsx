@@ -19,6 +19,20 @@ const Membership = lazy(() => import('./pages/Membership.jsx'));
 const Pricing = lazy(() => import('./pages/Pricing.jsx'));
 const Login = lazy(() => import('./pages/Login.jsx'));
 
+// Admin Pages
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
+const AdminUsers = lazy(() => import('./pages/Users.jsx'));
+const AdminCategories = lazy(() => import('./pages/Categories.jsx'));
+const AdminPosts = lazy(() => import('./pages/Posts.jsx'));
+const AdminEvents = lazy(() => import('./pages/AdminEvents.jsx'));
+const AdminGallery = lazy(() => import('./pages/AdminGallery.jsx'));
+const AdminVideos = lazy(() => import('./pages/AdminVideos.jsx'));
+const AdminComments = lazy(() => import('./pages/AdminComments.jsx'));
+const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
+const AdminAnnouncements = lazy(() => import('./pages/AdminAnnouncements.jsx'));
+const AdminDonations = lazy(() => import('./pages/AdminDonations.jsx'));
+const AdminSettings = lazy(() => import('./pages/AdminSettings.jsx'));
+
 
 const router = createBrowserRouter(
   [
@@ -36,7 +50,20 @@ const router = createBrowserRouter(
         { path: '/blog/:slug', element: <BlogDetails /> },
         { path: '/membership', element: <Membership />},
         { path: '/pricing', element: <Pricing />},
-        { path: '/login', element: <Login /> }
+        { path: '/login', element: <Login /> },
+          // Admin Routes
+          { path: '/admin', element: <AdminDashboard /> },
+          { path: '/admin/users', element: <AdminUsers /> },
+          { path: '/admin/categories', element: <AdminCategories /> },
+          { path: '/admin/posts', element: <AdminPosts /> },
+          { path: '/admin/events', element: <AdminEvents /> },
+          { path: '/admin/gallery', element: <AdminGallery /> },
+          { path: '/admin/videos', element: <AdminVideos /> },
+          { path: '/admin/comments', element: <AdminComments /> },
+          { path: '/admin/messages', element: <AdminMessages /> },
+          { path: '/admin/announcements', element: <AdminAnnouncements /> },
+          { path: '/admin/donations', element: <AdminDonations /> },
+          { path: '/admin/settings', element: <AdminSettings /> }
       ],
     },
   ],
