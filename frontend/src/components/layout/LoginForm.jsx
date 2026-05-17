@@ -1,5 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Add this import
 import './LoginForm.css';
+
+// ✅ DEFAULT CREDENTIALS
+const DEFAULT_CREDENTIALS = {
+  email: 'admin@legacy.com',
+  password: 'admin123'
+};
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,6 +18,7 @@ const validatePassword = (password) => {
 };
 
 export default function LoginForm() {
+  const navigate = useNavigate(); // ✅ For redirect
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,7 +36,6 @@ export default function LoginForm() {
       [name]: value,
     }));
     
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -86,31 +93,35 @@ export default function LoginForm() {
     }
 
     setIsLoading(true);
-    try {
-      // TODO: Replace with actual API call
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
 
-      if (response.ok) {
-        setSuccessMessage('Login successful!');
-        setFormData({ email: '', password: '' });
-        setTouched({});
-        // Handle redirect or token storage here
+    // ✅ MOCK AUTHENTICATION (2 second delay for realism)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    try {
+      // ✅ CHECK DEFAULT CREDENTIALS
+      if (
+        formData.email === DEFAULT_CREDENTIALS.email &&
+        formData.password === DEFAULT_CREDENTIALS.password
+      ) {
+        // ✅ SUCCESS: Store mock token & redirect
+        localStorage.setItem('authToken', 'mock-jwt-token');
+        localStorage.setItem('userRole', 'admin');
+        
+        setSuccessMessage('Login successful! Redirecting...');
+        
+        // ✅ REDIRECT TO /admin AFTER 1 SECOND
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1000);
+        
+        return;
       } else {
-        setErrors((prev) => ({
-          ...prev,
-          submit: 'Login failed. Please check your credentials.',
-        }));
+        throw new Error('Invalid credentials');
       }
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        submit: 'An error occurred. Please try again.',
+        submit: '❌ Invalid email or password. Try: admin@legacy.com / admin123',
       }));
     } finally {
       setIsLoading(false);
@@ -119,7 +130,16 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="login-form">
-      <h2>Login</h2>
+      <h2>Admin Login</h2>
+      
+      {/* ✅ DEFAULT CREDENTIALS HINT */}
+      <div className="credential-hint">
+        <div className="hint-box">
+          <strong>Demo Credentials:</strong><br />
+          📧 <code>admin@legacy.com</code><br />
+          🔑 <code>admin123</code>
+        </div>
+      </div>
 
       {errors.submit && <div className="error-alert">{errors.submit}</div>}
       {successMessage && <div className="success-alert">{successMessage}</div>}
@@ -134,7 +154,7 @@ export default function LoginForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           className={`form-input ${errors.email && touched.email ? 'input-error' : ''}`}
-          placeholder="Enter your email"
+          placeholder="admin@legacy.com"
         />
         {errors.email && touched.email && (
           <span className="error-message">{errors.email}</span>
@@ -151,7 +171,7 @@ export default function LoginForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           className={`form-input ${errors.password && touched.password ? 'input-error' : ''}`}
-          placeholder="Enter your password"
+          placeholder="admin123"
         />
         {errors.password && touched.password && (
           <span className="error-message">{errors.password}</span>
@@ -159,7 +179,14 @@ export default function LoginForm() {
       </div>
 
       <button type="submit" className="submit-btn" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
+        {isLoading ? (
+          <span className="flex items-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            Logging in...
+          </span>
+        ) : (
+          'Login to Admin'
+        )}
       </button>
 
       <div className="form-footer">
