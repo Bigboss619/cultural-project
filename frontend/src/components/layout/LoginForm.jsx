@@ -115,8 +115,12 @@ export default function LoginForm() {
     } catch (error) {
       const message =
         error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.errors?.[0]?.msg ||
         error?.message ||
         'Invalid email or password';
+
+      console.error('Login error:', error?.response?.data || error);
 
       setErrors((prev) => ({
         ...prev,
