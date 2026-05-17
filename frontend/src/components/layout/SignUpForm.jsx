@@ -134,40 +134,37 @@ export default function SignupForm() {
     }
 
     setIsLoading(true);
+
     try {
-      // TODO: Replace with actual API call
       const response = await axios.post(`${API_BASE}/api/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-        }),
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
       });
 
-      if (response.ok) {
-        setSuccessMessage('Signup successful! Please check your email to verify your account.');
-        setFormData({
-          fullName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          agreeTerms: false,
-        });
-        setTouched({});
-      } else {
-        setErrors((prev) => ({
-          ...prev,
-          submit: 'Signup failed. Please try again.',
-        }));
-      }
+      setSuccessMessage(
+        response?.data?.message ||
+          'Signup successful! Please check your email to verify your account.'
+      );
+
+      setFormData({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        agreeTerms: false,
+      });
+      setTouched({});
     } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        'Signup failed. Please try again.';
+
       setErrors((prev) => ({
         ...prev,
-        submit: 'An error occurred. Please try again.',
+        submit: `❌ ${message}`,
       }));
     } finally {
       setIsLoading(false);
