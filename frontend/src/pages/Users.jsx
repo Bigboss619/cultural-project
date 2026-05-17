@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Edit2, Trash2, Lock, Shield } from 'lucide-react';
 import UserHeader from '../components/AdminUsers/UserHeader';
@@ -11,11 +12,10 @@ import AssignRolesModal from '../components/AdminUsers/AssignRolesModal';
 
 const Users = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Moderator', status: 'Inactive' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
 
   // Modal states
   const [editModal, setEditModal] = useState({ isOpen: false, user: null });
@@ -68,10 +68,17 @@ const Users = () => {
     setRolesModal({ isOpen: false, user: null });
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return users;
+
+    return users.filter((user) => {
+      const name = user?.name || '';
+      const email = user?.email || '';
+      return name.toLowerCase().includes(q) || email.toLowerCase().includes(q);
+    });
+  }, [users, searchQuery]);
+
 
   const actions = [
     { icon: Edit2, label: 'Edit', handler: handleEditUser, color: 'blue' },
@@ -80,15 +87,69 @@ const Users = () => {
     { icon: Trash2, label: 'Delete', handler: handleDeleteUser, color: 'red' },
   ];
 
+  useEffect(() => {
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+    if (!authToken) {
+      setError('Not authenticated. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        const resp = await axios.get('/api/users', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        const list = resp?.data?.users || [];
+        if (isMounted) setUsers(list);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err?.response?.data?.message || 'Failed to fetch users');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchUsers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <UserHeader />
         <UserSearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-        <UserTable 
-          users={filteredUsers} 
-          actions={actions}
-        />
+
+        {loading && (
+          <div className="rounded-lg border border-gray-200 dark:border-slate-700 p-4 text-sm">
+            Loading users...
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-lg border border-red-200 dark:border-red-900/50 p-4 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <UserTable
+            users={filteredUsers}
+            actions={actions}
+          />
+        )}
+
 
         {/* Modals */}
         <EditUserModal
