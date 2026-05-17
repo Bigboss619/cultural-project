@@ -1,16 +1,9 @@
-# TODO
+- [x] Update AdminHeader to fetch authenticated admin profile from GET /api/auth/profile using stored authToken
+- [x] Replace hardcoded dropdown title/email with fetched name/email
+- [x] Update header button to show fetched name (fallback to Admin)
+- [x] Ensure production/deployment compatibility (use relative API URL and safe token handling)
+- [ ] Quick test: run frontend build/start and verify dropdown shows correct user info
 
-## AdminMessages refactor
-- [x] Replace `frontend/src/pages/AdminMessages.jsx` placeholder with full Messages/Contact management UI (tabs, features/toolbar, list + details split, reply, mark as read) using mock data.
-- [x] Add mock data module `frontend/src/components/Messages/messagesMockData.js`.
-- [x] Create components under `frontend/src/components/Messages/`:
-  - [x] `MessagesTabs.jsx`
-  - [x] `MessagesToolbar.jsx`
-  - [x] `MessagesList.jsx`
-  - [x] `MessageDetails.jsx`
-  - [x] `ReplyBox.jsx`
-- [ ] Wire components together in `AdminMessages.jsx`.
-- [ ] Run frontend lint/build to ensure no errors.
 
 
 

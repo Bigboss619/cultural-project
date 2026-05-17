@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useTheme, useSidebar } from './AdminLayout';
+
 import {
   Menu,
   Search,
@@ -20,7 +22,46 @@ const AdminHeader = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
 
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState('');
+
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+  const fetchProfile = async () => {
+    if (!authToken) {
+      setProfile(null);
+      return;
+    }
+
+    setProfileLoading(true);
+    setProfileError('');
+    try {
+      const resp = await axios.get('/api/auth/profile', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      setProfile(resp?.data?.user || null);
+    } catch (err) {
+      setProfile(null);
+      setProfileError(err?.response?.data?.message || 'Failed to load profile');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const displayName = profile?.name || 'Admin';
+  const displayEmail = profile?.email || 'admin@example.com';
+
   // Generate breadcrumb from location
+
   const getBreadcrumbs = () => {
     const paths = location.pathname.split('/').filter(Boolean);
     const breadcrumbs = [{ label: 'Home', path: '/admin' }];
@@ -140,9 +181,13 @@ const AdminHeader = () => {
               }`}
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
-                AD
+                {(displayName?.[0] || 'A').toUpperCase()}
               </div>
-              <span className="hidden sm:inline text-sm font-medium">Admin</span>
+              <span className="hidden sm:inline text-sm font-medium">
+                {displayName}
+              </span>
+
+
               <ChevronDown size={16} />
             </button>
 
@@ -155,12 +200,14 @@ const AdminHeader = () => {
               >
                 <div className={`px-4 py-2 border-b ${isDarkMode ? 'border-slate-600' : 'border-gray-200'}`}>
                   <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    Admin User
+                    {displayName === 'Admin' ? 'Admin User' : displayName}
                   </p>
                   <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
-                    admin@example.com
+                    {displayEmail}
                   </p>
+
                 </div>
+
 
                 <button
                   className={`w-full px-4 py-2 flex items-center gap-2 text-left text-sm transition-colors ${
