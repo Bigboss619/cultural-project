@@ -4,7 +4,7 @@ import UserActionMenu from './UserActionMenu';
 const UserTable = ({ users, actions }) => {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-700">
-      <table className="w-full">
+      <table className="w-full overflow-visible">
         <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
           <tr>
             <th className="px-6 py-3 text-left text-sm font-semibold">Name</th>
