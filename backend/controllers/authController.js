@@ -66,7 +66,7 @@ async function login(req, res) {
     }
 
     const rows = await new Promise((resolve, reject) => {
-      db.query('SELECT id, email, password_hash, role FROM users WHERE email = ?', [email], (err, r) => {
+      db.query('SELECT id, email, password, role FROM users WHERE email = ?', [email], (err, r) => {
         if (err) return reject(err);
         resolve(r);
       });

@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import './SignupForm.css';
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:5000';
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -133,7 +136,7 @@ export default function SignupForm() {
     setIsLoading(true);
     try {
       // TODO: Replace with actual API call
-      const response = await fetch('/api/auth/signup', {
+      const response = await axios.post(`${API_BASE}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
