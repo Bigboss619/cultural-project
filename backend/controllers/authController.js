@@ -22,6 +22,7 @@ async function register(req, res) {
       return res.status(400).json({ message: 'email and password are required' });
     }
 
+
     const existing = await new Promise((resolve, reject) => {
       db.query('SELECT id, email FROM users WHERE email = ?', [email], (err, rows) => {
         if (err) return reject(err);

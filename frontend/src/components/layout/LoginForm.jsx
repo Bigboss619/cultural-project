@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import './LoginForm.css';
 
-const API_BASE = 'http://localhost:5000';
+// const API_BASE = 'http://localhost:5000';
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -93,7 +93,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const resp = await axios.post(`${API_BASE}/api/auth/login`, {
+      const resp = await axios.post('/api/auth/login', {
         email: formData.email,
         password: formData.password,
       });
