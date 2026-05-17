@@ -143,12 +143,19 @@ const Users = () => {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && filteredUsers.length === 0 && (
+          <div className="rounded-lg border border-gray-200 dark:border-slate-700 p-4 text-sm text-gray-600 dark:text-gray-300">
+            No users found.
+          </div>
+        )}
+
+        {!loading && !error && filteredUsers.length > 0 && (
           <UserTable
             users={filteredUsers}
             actions={actions}
           />
         )}
+
 
 
         {/* Modals */}
