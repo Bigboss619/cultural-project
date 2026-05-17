@@ -105,7 +105,7 @@ export default function LoginForm() {
       }
 
       localStorage.setItem('authToken', token);
-      localStorage.setItem('userRole', user?.role || 'user');
+      localStorage.setItem('userRole', user?.role);
 
       setSuccessMessage('Login successful! Redirecting...');
 
