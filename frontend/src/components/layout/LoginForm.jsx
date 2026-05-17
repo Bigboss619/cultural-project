@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ Add this import
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 import './LoginForm.css';
 
-// ✅ DEFAULT CREDENTIALS
-const DEFAULT_CREDENTIALS = {
-  email: 'admin@legacy.com',
-  password: 'admin123'
-};
+const API_BASE = 'http://localhost:5000';
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,34 +92,35 @@ export default function LoginForm() {
 
     setIsLoading(true);
 
-    // ✅ MOCK AUTHENTICATION (2 second delay for realism)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
     try {
-      // ✅ CHECK DEFAULT CREDENTIALS
-      if (
-        formData.email === DEFAULT_CREDENTIALS.email &&
-        formData.password === DEFAULT_CREDENTIALS.password
-      ) {
-        // ✅ SUCCESS: Store mock token & redirect
-        localStorage.setItem('authToken', 'mock-jwt-token');
-        localStorage.setItem('userRole', 'admin');
-        
-        setSuccessMessage('Login successful! Redirecting...');
-        
-        // ✅ REDIRECT TO /admin AFTER 1 SECOND
-        setTimeout(() => {
-          navigate('/admin');
-        }, 1000);
-        
-        return;
-      } else {
-        throw new Error('Invalid credentials');
+      const resp = await axios.post(`${API_BASE}/api/auth/login`, {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const { token, user } = resp.data || {};
+
+      if (!token) {
+        throw new Error('No token returned from server');
       }
+
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('userRole', user?.role || 'user');
+
+      setSuccessMessage('Login successful! Redirecting...');
+
+      setTimeout(() => {
+        navigate('/admin');
+      }, 500);
     } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Invalid email or password';
+
       setErrors((prev) => ({
         ...prev,
-        submit: '❌ Invalid email or password. Try: admin@legacy.com / admin123',
+        submit: `❌ ${message}`,
       }));
     } finally {
       setIsLoading(false);
