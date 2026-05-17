@@ -132,13 +132,13 @@ export default function LoginForm() {
       <h2>Admin Login</h2>
       
       {/* ✅ DEFAULT CREDENTIALS HINT */}
-      <div className="credential-hint">
+      {/* <div className="credential-hint">
         <div className="hint-box">
           <strong>Demo Credentials:</strong><br />
           📧 <code>admin@legacy.com</code><br />
           🔑 <code>admin123</code>
         </div>
-      </div>
+      </div> */}
 
       {errors.submit && <div className="error-alert">{errors.submit}</div>}
       {successMessage && <div className="success-alert">{successMessage}</div>}
