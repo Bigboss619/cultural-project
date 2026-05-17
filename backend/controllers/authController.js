@@ -34,13 +34,13 @@ async function register(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const finalRole = role || 'user';
+    // const finalRole = role || 'user';
     const finalName = name || null;
 
     const result = await new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-        [finalName, email, passwordHash, finalRole],
+        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+        [finalName, email, passwordHash],
         (err, r) => {
           if (err) return reject(err);
           resolve(r);

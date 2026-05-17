@@ -136,7 +136,7 @@ export default function SignupForm() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/signup`, {
+      const response = await axios.post(`${API_BASE}/api/auth/register`, {
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
