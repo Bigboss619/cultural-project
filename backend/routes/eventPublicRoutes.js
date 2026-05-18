@@ -6,13 +6,21 @@ const {
 
 const router = express.Router();
 
+// Safely parse JSON, returning empty array on failure
+function safeParse(jsonStr, fallback) {
+  if (!jsonStr) return fallback;
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    return fallback;
+  }
+}
+
 // Public routes - no auth required
 
 // GET /api/public/events - Get all published events for public website
 router.get('/', async (req, res) => {
   try {
-    // const db = require('../config/config');
-
     const rows = await new Promise((resolve, reject) => {
       db.query(
         `SELECT
@@ -44,7 +52,7 @@ router.get('/', async (req, res) => {
 
     const events = rows.map(event => ({
       ...event,
-      ticket_links: event.ticket_links ? JSON.parse(event.ticket_links) : [],
+      ticket_links: safeParse(event.ticket_links, []),
       rsvp_enabled: Boolean(event.rsvp_enabled),
       rsvp_accepted: event.rsvp_accepted || 0,
     }));
@@ -58,7 +66,6 @@ router.get('/', async (req, res) => {
 // GET /api/public/events/:id - Get single published event
 router.get('/:id', async (req, res) => {
   try {
-    const db = require('../config/config');
     const { id } = req.params;
 
     const row = await new Promise((resolve, reject) => {
@@ -95,7 +102,7 @@ router.get('/:id', async (req, res) => {
     return res.json({
       event: {
         ...row,
-        ticket_links: row.ticket_links ? JSON.parse(row.ticket_links) : [],
+        ticket_links: safeParse(row.ticket_links, []),
         rsvp_enabled: Boolean(row.rsvp_enabled),
         rsvp_accepted: row.rsvp_accepted || 0,
       }
