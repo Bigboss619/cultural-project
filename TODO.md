@@ -1,34 +1,21 @@
-# TODO - Categories Backend + Frontend
+# TODO
 
-- [x] Implement backend controller: `backend/controllers/categoryController.js`
-  - [ ] GET all categories
-  - [ ] GET category by id
-  - [ ] POST create category (slugify name)
-  - [ ] PUT/PATCH update category (slugify if name changes)
-  - [ ] DELETE category
+- [x] Implement backend posts CRUD in `backend/controllers/postController.js`
 
+- [x] Implement `backend/routes/postRoutes.js` endpoints (GET/POST/PUT/DELETE) with `requireAuth`
 
-- [x] Implement backend routes: `backend/routes/categoryRoutes.js`
-  - [x] Protect GET/POST/PUT/PATCH/DELETE with `requireAuth`
+- [x] Wire posts routes in `backend/server.js` under `/api/posts`
 
+- [ ] Connect `frontend/src/pages/Posts.jsx` to backend (fetch posts, delete, edit, publish)
+- [ ] Update `frontend/src/components/Post/PostEditorModal.jsx` to:
+  - [ ] fetch categories dynamically from `/api/categories`
+  - [ ] use `category_id` in payload
+  - [ ] call backend for create/update
+- [ ] Ensure delete works end-to-end from Posts list
+- [ ] Run backend + frontend and verify list/create/edit/delete flows
+- [x] Confirm editor/category dropdown uses backend (not hardcoded)
+- [x] Backend posts CRUD + /api/posts wiring
 
-
-- [x] Mount routes in `backend/server.js`
-  - [x] `app.use('/api/categories', categoryRoutes)`
-
-
-- [x] Update frontend page: `frontend/src/pages/Categories.jsx`
-  - [x] Replace mock state with API calls
-  - [x] Wire Add/Edit/Delete to backend endpoints
-  - [x] Add loading + error states
-  - [x] Keep search + modals UI
-
-
-
-- [x] Run & verify
-  - [ ] Start backend
-  - [ ] Start frontend
-  - [ ] Test `/admin/categories` CRUD end-to-end
 
 
 

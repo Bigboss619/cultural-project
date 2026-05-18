@@ -1,13 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { FeaturedPostsPanel, PostsFeatures, PostsList, PostsToolbar } from '../components/Post';
 
-import { INITIAL_FEATURES, INITIAL_POSTS } from '../components/Post/mockPostsData';
+import { INITIAL_FEATURES } from '../components/Post/mockPostsData';
 import { PostEditorModal } from '../components/Post';
 import { useNavigate } from 'react-router-dom';
 
 const Posts = () => {
-  const [articles] = useState(INITIAL_POSTS);
+  const [articles, setArticles] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('create');
   const [editId, setEditId] = useState(null);
@@ -17,6 +19,40 @@ const Posts = () => {
   const [filter, setFilter] = useState('all'); // all | published | draft
 
   const navigate = useNavigate();
+
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const [loadingPosts, setLoadingPosts] = useState(false);
+  const [postsError, setPostsError] = useState('');
+
+  const fetchPosts = async () => {
+    if (!authToken) {
+      setPostsError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    setLoadingPosts(true);
+    setPostsError('');
+
+    try {
+      const resp = await axios.get('/api/posts', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      setArticles(resp?.data?.posts || []);
+    } catch (err) {
+      setPostsError(err?.response?.data?.message || 'Failed to load posts');
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authToken]);
+
 
   const filteredArticles = useMemo(() => {
 
@@ -71,7 +107,33 @@ const Posts = () => {
     return null;
   }, [articles, modalMode, editId]);
 
-  const upsertArticle = (payload) => {
+  const upsertArticle = async (payload) => {
+    if (!authToken) {
+      setPostsError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    try {
+      setPostsError('');
+
+      if (modalMode === 'create') {
+        await axios.post('/api/posts', payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      } else {
+        await axios.put(`/api/posts/${editId}`, payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+      }
+
+      closeModal();
+      await fetchPosts();
+    } catch (err) {
+      setPostsError(err?.response?.data?.message || 'Failed to save post');
+    }
+  };
+
+
     const now = new Date().toISOString();
 
     if (modalMode === 'create') {
@@ -212,6 +274,7 @@ const Posts = () => {
     </AdminLayout>
   );
 };
+
 
 export default Posts;
 

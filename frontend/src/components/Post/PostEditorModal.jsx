@@ -10,28 +10,86 @@ const PostEditorModal = ({
   onClose,
   onSave,
 }) => {
-  const categories = useMemo(
-    () => ['History', 'Festivals', 'Traditional Attire', 'Food', 'Language', 'Dance', 'Music', 'Religion'],
-    []
-  );
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoriesError, setCategoriesError] = useState('');
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState(categories[0]);
+
+  const [categoryId, setCategoryId] = useState(null);
+
   const [status, setStatus] = useState('draft');
   const [featured, setFeatured] = useState(false);
   const [summary, setSummary] = useState('');
   const [content, setContent] = useState('');
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchCategories = async () => {
+      if (!isOpen) return;
+      if (!authToken) {
+        setCategoriesError('Not authenticated');
+        return;
+      }
+
+      try {
+        setLoadingCategories(true);
+        setCategoriesError('');
+
+        const resp = await fetch('/api/categories', {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => null);
+          throw new Error(data?.message || 'Failed to fetch categories');
+        }
+
+        const data = await resp.json();
+        if (!isMounted) return;
+        setCategories(data?.categories || []);
+      } catch (e) {
+        if (!isMounted) return;
+        setCategoriesError(e?.message || 'Failed to fetch categories');
+      } finally {
+        if (!isMounted) return;
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, authToken]);
+
+  useEffect(() => {
     if (!isOpen) return;
 
     setTitle(normalize(initialData?.title));
-    setCategory(normalize(initialData?.category) || categories[0]);
+
+    // editor uses category_id (number) but we also tolerate older shapes
+    const nextCategoryId =
+      initialData?.category_id ?? initialData?.categoryId ?? initialData?.category;
+
+    if (categories?.length) {
+      const asString = String(nextCategoryId ?? '');
+      const found = categories.find((c) => String(c.id) === asString);
+      setCategoryId(found ? found.id : categories[0].id);
+    } else {
+      // will be set after categories arrive
+      setCategoryId(nextCategoryId ?? null);
+    }
+
     setStatus(normalize(initialData?.status) || 'draft');
     setFeatured(Boolean(initialData?.featured));
     setSummary(normalize(initialData?.summary));
     setContent(normalize(initialData?.content));
   }, [isOpen, initialData, categories]);
+
 
   const titleId = 'post-editor-title';
 
@@ -41,12 +99,15 @@ const PostEditorModal = ({
 
     onSave({
       title: cleanTitle,
-      category,
+      category_id: categoryId,
       status,
-      featured: status === 'published' ? featured : false, // drafts cannot be featured
+      // featured_image is what the backend table stores; UI checkbox kept for now
+      featured_image: status === 'published' ? (featured ? 'featured' : null) : null,
+      featured,
       summary: summary.trim() || '—',
       content: content.trim() || '—',
     });
+
   };
 
   if (!isOpen) return null;
@@ -86,15 +147,17 @@ const PostEditorModal = ({
             <div>
               <label className="text-sm font-medium">Category</label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoryId ?? ''}
+                onChange={(e) => setCategoryId(Number(e.target.value))}
+
                 className="mt-1 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
+
               </select>
             </div>
           </div>
