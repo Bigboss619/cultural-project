@@ -1,68 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { Clock } from 'lucide-react';
-
-// ============================================
-// MOCK DATA
-// ============================================
-const CATEGORIES = [
-  { id: 'all', label: 'All' },
-  { id: 'events', label: 'Events' },
-  { id: 'community', label: 'Community' },
-  { id: 'culture', label: 'Culture' },
-  { id: 'impact', label: 'Impact' },
-  { id: 'arts-culture', label: 'Arts & Culture' },
-];
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    slug: 'youth-mentorship-program',
-    title: 'Launching Our New Youth Mentorship Program',
-    description:
-      'Legacy Stars introduces a comprehensive mentorship program connecting young community members with experienced leaders. Learn how you can participate as a mentor or mentee.',
-    category: 'community',
-    author: 'Zainab Adeleke',
-    readTime: 4,
-    date: '1/10/2025',
-    image: '/images/traditions.jpg',
-  },
-  {
-    id: 2,
-    slug: 'preserving-yoruba-language',
-    title: 'The Importance of Preserving the Yoruba Language',
-    description:
-      'An exploration of why preserving the Yoruba language is crucial for cultural identity and how Legacy Stars is contributing to this important mission.',
-    category: 'culture',
-    author: 'Dr. Adebayo Ogunwale',
-    readTime: 6,
-    date: '1/5/2025',
-    image: '/images/hero-banner.jpg',
-  },
-  {
-    id: 3,
-    slug: 'community-service-impact',
-    title: '2024 Community Service Impact Report',
-    description:
-      'A comprehensive overview of Legacy Stars\' community service initiatives in 2024, including volunteer hours, beneficiaries served, and future goals.',
-    category: 'impact',
-    author: 'Folake Adeyemi',
-    readTime: 5,
-    date: '12/28/2024',
-    image: '/images/cultural-heritage.jpg',
-  },
-  {
-    id: 4,
-    slug: 'traditional-crafts-revival',
-    title: 'Reviving Traditional Ibadan Crafts: Artisan Spotlight',
-    description:
-      'Meet the talented artisans keeping traditional Ibadan crafts alive. Learn about their work and how you can support local craftspeople.',
-    category: 'arts-culture',
-    author: 'Olamide Okafor',
-    readTime: 4,
-    date: '12/20/2024',
-    image: '/images/traditions.jpg',
-  },
-];
 
 // Color constants
 const COLORS = {
@@ -73,22 +11,34 @@ const COLORS = {
   textSecondary: '#999',
 };
 
+// Helper to format date
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+};
+
+// Helper to calculate read time
+const calculateReadTime = (content) => {
+  if (!content) return 1;
+  return Math.max(1, Math.ceil(String(content).length / 1000));
+};
+
 // ============================================
 // SUB-COMPONENTS
 // ============================================
 
 const CategoryButton = ({ category, isActive, onClick }) => {
-  const isAllButton = category.id === 'all';
   const bgColor = isActive ? COLORS.primary : COLORS.light;
   const textColor = isActive ? 'white' : COLORS.text;
-  const hoverClass = !isActive ? `hover:bg-[${COLORS.border}]` : '';
+  const hoverClass = !isActive ? 'hover:opacity-80' : '';
 
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
+      className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${hoverClass} ${
         isActive ? 'shadow-md' : ''
-      } ${hoverClass}`}
+      }`}
       style={{
         backgroundColor: bgColor,
         color: textColor,
@@ -106,29 +56,29 @@ const BlogCard = ({ post }) => {
       className="group cursor-pointer block h-full"
     >
       <div className="card-heritage overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
-        
+
         {/* Image Container */}
         <div className="relative overflow-hidden h-48">
           <img
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            src={post.image}
+            src={post.featured_image || '/images/traditions.jpg'}
           />
-          
+
           {/* Category Badge */}
           <div className="absolute top-4 right-4">
             <span
               className="inline-block px-3 py-1 text-white text-xs font-semibold rounded"
               style={{ backgroundColor: COLORS.primary }}
             >
-              {CATEGORIES.find((cat) => cat.id === post.category)?.label}
+              {post.category || 'Uncategorized'}
             </span>
           </div>
         </div>
 
         {/* Content Container */}
         <div className="p-6 flex flex-col flex-grow">
-          
+
           {/* Title */}
           <h3
             className="text-xl font-display font-bold mb-3 group-hover:text-[#B85C3C] transition-colors duration-300 line-clamp-2"
@@ -137,9 +87,9 @@ const BlogCard = ({ post }) => {
             {post.title}
           </h3>
 
-          {/* Description */}
+          {/* Description / Summary */}
           <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {post.description}
+            {post.summary || ''}
           </p>
 
           {/* Footer: Author & Read Time */}
@@ -147,32 +97,95 @@ const BlogCard = ({ post }) => {
             className="flex items-center justify-between text-xs border-t pt-4 mt-auto"
             style={{ borderColor: COLORS.border, color: COLORS.textSecondary }}
           >
-            <span>{post.author}</span>
+            <span>Legacy Stars Team</span>
             <div className="flex items-center gap-1">
               <Clock width={14} height={14} />
-              <span>{post.readTime} min</span>
+              <span>{calculateReadTime(post.content)} min</span>
             </div>
           </div>
 
           {/* Date */}
-          <div className="text-xs text-gray-400 mt-2">{post.date}</div>
+          <div className="text-xs text-gray-400 mt-2">{formatDate(post.created_at)}</div>
         </div>
       </div>
     </a>
   );
 };
 
+// Loading skeleton
+const BlogCardSkeleton = () => (
+  <div className="overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col bg-white rounded-lg">
+    <div className="relative overflow-hidden h-48 animate-pulse bg-gray-200"></div>
+    <div className="p-6 flex flex-col flex-grow space-y-3">
+      <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4"></div>
+      <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+      <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+      <div className="mt-auto pt-4 border-t">
+        <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
+      </div>
+    </div>
+  </div>
+);
+
 // ============================================
 // MAIN COMPONENT
 // ============================================
 
 const Category = () => {
+  const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const filteredPosts =
-    activeCategory === 'all'
-      ? BLOG_POSTS
-      : BLOG_POSTS.filter((post) => post.category === activeCategory);
+  // Build unique categories from posts
+  const getCategoriesFromPosts = useCallback((postsData) => {
+    const categoryMap = new Map();
+    categoryMap.set('all', { id: 'all', label: 'All' });
+
+    postsData.forEach((post) => {
+      if (post.category_id && post.category && !categoryMap.has(post.category_id)) {
+        categoryMap.set(post.category_id, {
+          id: post.category_id,
+          label: post.category,
+        });
+      }
+    });
+
+    return Array.from(categoryMap.values());
+  }, []);
+
+  const fetchPosts = useCallback(async (categoryId = null) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = categoryId && categoryId !== 'all' ? { category_id: categoryId } : {};
+      const resp = await axios.get('/api/public/posts', { params });
+
+      const postsData = resp.data?.posts || [];
+      setPosts(postsData);
+
+      // Build categories from posts if not already set
+      if (categories.length === 0) {
+        setCategories(getCategoriesFromPosts(postsData));
+      }
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+      setError('Failed to load posts');
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [categories.length, getCategoriesFromPosts]);
+
+  useEffect(() => {
+    fetchPosts(activeCategory === 'all' ? null : activeCategory);
+  }, [activeCategory, fetchPosts]);
+
+  const handleCategoryClick = (categoryId) => {
+    setActiveCategory(categoryId);
+  };
 
   return (
     <>
@@ -186,12 +199,21 @@ const Category = () => {
             Filter by Category
           </h3>
           <div className="flex flex-wrap gap-3">
-            {CATEGORIES.map((category) => (
+            {categories.length === 0 && (
+              <>
+                <CategoryButton
+                  category={{ id: 'all', label: 'All' }}
+                  isActive={activeCategory === 'all'}
+                  onClick={() => handleCategoryClick('all')}
+                />
+              </>
+            )}
+            {categories.map((category) => (
               <CategoryButton
                 key={category.id}
                 category={category}
                 isActive={activeCategory === category.id}
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => handleCategoryClick(category.id)}
               />
             ))}
           </div>
@@ -200,11 +222,35 @@ const Category = () => {
 
       {/* Blog Posts Grid */}
       <div className="container py-12 md:py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredPosts.map((post) => (
-            <BlogCard key={post.id} post={post} />
-          ))}
-        </div>
+        {error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500">{error}</p>
+            <button
+              onClick={() => fetchPosts(activeCategory === 'all' ? null : activeCategory)}
+              className="mt-4 px-4 py-2 bg-[#B85C3C] text-white rounded hover:bg-[#A04A2E]"
+            >
+              Retry
+            </button>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              <>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <BlogCardSkeleton key={i} />
+                ))}
+              </>
+            ) : posts.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500">No posts found.</p>
+              </div>
+            ) : (
+              posts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))
+            )}
+          </div>
+        )}
       </div>
     </>
   );
