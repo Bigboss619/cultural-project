@@ -86,13 +86,17 @@ const Posts = () => {
   }, [articles]);
 
   const openCreate = () => {
-    navigate('/admin/posts/new');
+    setModalMode('create');
+    setEditId(null);
+    setIsModalOpen(true);
   };
-
 
   const openEdit = (article) => {
-    navigate(`/admin/posts/edit/${article.id}`);
+    setModalMode('edit');
+    setEditId(article.id);
+    setIsModalOpen(true);
   };
+
 
 
   const closeModal = () => {
@@ -134,45 +138,8 @@ const Posts = () => {
   };
 
 
-    const now = new Date().toISOString();
 
-    if (modalMode === 'create') {
-      const nextId = articles.length ? Math.max(...articles.map((a) => a.id)) + 1 : 1;
-      const next = {
-        id: nextId,
-        title: payload.title,
-        category: payload.category,
-        status: payload.status,
-        featured: payload.featured,
-        summary: payload.summary,
-        content: payload.content,
-        updatedAt: now,
-      };
 
-      setArticles((prev) => [next, ...prev]);
-      closeModal();
-      return;
-    }
-
-    setArticles((prev) =>
-      prev.map((a) => {
-        if (a.id !== editId) return a;
-        return {
-          ...a,
-          title: payload.title,
-          category: payload.category,
-          status: payload.status,
-          // ensure featured can only be true when published
-          featured: payload.status === 'published' ? payload.featured : false,
-          summary: payload.summary,
-          content: payload.content,
-          updatedAt: now,
-        };
-      })
-    );
-
-    closeModal();
-  };
 
   const deleteArticle = (article) => {
     const ok = window.confirm(`Delete article “${article.title}”?`);
@@ -183,19 +150,33 @@ const Posts = () => {
     if (modalMode === 'edit' && editId === article.id) closeModal();
   };
 
-  const publishArticle = (article) => {
-    setArticles((prev) =>
-      prev.map((a) => {
-        if (a.id !== article.id) return a;
-        return {
-          ...a,
+  const publishArticle = async (article) => {
+    if (!authToken) {
+      setPostsError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    try {
+      setPostsError('');
+
+      // ensure featured toggle is persisted (backend uses `featured` boolean)
+      await axios.put(
+        `/api/posts/${article.id}`,
+        {
+          title: article.title,
+          content: article.content,
+          featured_image: article.featured_image,
+          category_id: article.category_id,
           status: 'published',
-          // keep featured only if it is currently true (editor disallows drafts -> featured)
-          featured: a.featured,
-          updatedAt: new Date().toISOString(),
-        };
-      })
-    );
+          featured: Boolean(article.featured),
+        },
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
+
+      await fetchPosts();
+    } catch (err) {
+      setPostsError(err?.response?.data?.message || 'Failed to publish post');
+    }
   };
 
   return (

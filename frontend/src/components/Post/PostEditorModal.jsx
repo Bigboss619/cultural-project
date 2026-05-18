@@ -118,7 +118,7 @@ const PostEditorModal = ({
         <div className="flex items-start justify-between mb-4">
           <div>
             <div className="text-lg font-bold">{mode === 'edit' ? 'Edit article' : 'Create article'}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Mock CRUD (local state only).</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Create/Edit using backend API.</div>
           </div>
           <button
             onClick={onClose}
