@@ -159,9 +159,13 @@ const NewArticle = () => {
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
+        err?.response?.data?.errors?.[0]?.message ||
         err?.message ||
         'Failed to save post';
+      // prevent stale success banner
+      setFormSuccess('');
       setFormError(msg);
+
       console.error('Save post failed:', err?.response?.data || err);
     } finally {
       setSaving(false);

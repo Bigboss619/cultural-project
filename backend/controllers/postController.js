@@ -159,7 +159,11 @@ async function createPost(req, res) {
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
 
     const finalContent = String(content || '').trim();
+    if(!finalContent) return res.status(400).json({ message: 'content is required' });
+
     const finalSummary = String(summary || '').trim();
+    if(!finalSummary) return res.status(400).json({ message: 'summary is required' });
+    
     const finalFeaturedImage = featured_image ? String(featured_image) : null;
 
     const userId = req.user?.userId || req.user?.id;
