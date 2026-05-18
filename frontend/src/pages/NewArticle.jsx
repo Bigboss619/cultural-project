@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import RichTextEditor from '../components/Post/RichTextEditor';
+import { useToast } from '../components/toast';
+
+
 
 const normalize = (s) => (s == null ? '' : String(s));
 
@@ -134,16 +137,17 @@ const NewArticle = () => {
 
     // enforce the same rules backend validates, so user sees messages reliably
     if (!safeSummary) {
+      // Toast user-friendly message
       setFormError('summary is required');
-      setFormSuccess('');
       return;
     }
 
     if (!safeContent) {
+      // Toast user-friendly message
       setFormError('content is required');
-      setFormSuccess('');
       return;
     }
+
 
     const payload = {
 
@@ -194,16 +198,10 @@ const NewArticle = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {formError && (
-          <div className="p-3 rounded-lg bg-red-50 text-red-700 border border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40">
-            {formError}
-          </div>
-        )}
-        {formSuccess && (
-          <div className="p-3 rounded-lg bg-green-50 text-green-700 border border-green-100 dark:bg-green-900/20 dark:text-green-200 dark:border-green-900/40">
-            {formSuccess}
-          </div>
-        )}
+        {/* Toasts are handled globally */}
+        {formError && null}
+        {formSuccess && null}
+
 
         <div className="flex items-center justify-between">
           <div>
