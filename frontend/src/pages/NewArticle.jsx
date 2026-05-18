@@ -118,15 +118,19 @@ const NewArticle = () => {
     setSaving(true);
     setFormError('');
 
+    const finalCategoryId = Number(categoryId);
     const payload = {
       title: cleanTitle,
-      category_id: categoryId,
+      category_id: Number.isFinite(finalCategoryId) ? finalCategoryId : categoryId,
       status,
+      // allow saving draft even if featured is checked
       featured: status === 'published' ? Boolean(featured) : false,
       featured_image: null,
       summary: normalize(summary).trim() || '—',
       content: normalize(content).trim() || '—',
     };
+
+
 
     try {
       if (isEdit) {
@@ -141,7 +145,13 @@ const NewArticle = () => {
 
       navigate('/admin/posts');
     } catch (err) {
-      setFormError(err?.response?.data?.message || 'Failed to save post');
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        'Failed to save post';
+      setFormError(msg);
+      console.error('Save post failed:', err?.response?.data || err);
     } finally {
       setSaving(false);
     }

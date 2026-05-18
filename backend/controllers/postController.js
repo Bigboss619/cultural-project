@@ -15,6 +15,31 @@ function toNum(v) {
   return Number.isFinite(n) ? n : null;
 }
 
+async function hasFeaturedPost(req) {
+  const userId = req.user?.userId || req.user?.id;
+  if (!userId) return false;
+
+  // only allow ONE featured published post globally (no per-user restriction)
+  const existing = await new Promise((resolve, reject) => {
+    db.query(
+      'SELECT id FROM posts WHERE featured = 1 AND status = "published" LIMIT 1',
+      (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows && rows[0] ? true : false);
+      }
+    );
+  });
+
+  return existing;
+}
+
+function isTurningFeaturedOn(status, featured) {
+  return status === 'published' && Boolean(featured);
+}
+
+
+
+
 // GET /api/posts
 async function getAllPosts(req, res) {
   try {
@@ -139,12 +164,21 @@ async function createPost(req, res) {
     const userId = req.user?.userId || req.user?.id;
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
+    // Featured constraint: only one published featured post at a time.
+    if (isTurningFeaturedOn(status, req.body?.featured)) {
+      const already = await hasFeaturedPost(req);
+      if (already) {
+        return res.status(400).json({ message: 'Only one featured post is allowed at a time. Unfeature the existing one first.' });
+      }
+    }
+
+
     const row = await new Promise((resolve, reject) => {
       db.query(
         `INSERT INTO posts
           (title, slug, content, featured_image, featured, category_id, user_id, status, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [finalTitle, finalSlug, finalContent, finalFeaturedImage, status === 'published' ? (featured ? 1 : 0) : 0, finalCategoryId, userId, finalStatus],
+        [finalTitle, finalSlug, finalContent, finalFeaturedImage, status === 'published' ? (Boolean(req.body?.featured) ? 1 : 0) : 0, finalCategoryId, userId, finalStatus],
         (err, result) => {
           if (err) return reject(err);
           resolve(result);
@@ -187,6 +221,16 @@ async function updatePost(req, res) {
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
 
     const finalFeatured = finalStatus === 'published' ? (featured ? 1 : 0) : 0;
+
+    // Featured constraint on update as well (only when turning featured on)
+    if (isTurningFeaturedOn(finalStatus, featured)) {
+      const already = await hasFeaturedPost(req);
+      if (already) {
+        // allow turning on if the featured row is the same post
+        return res.status(400).json({ message: 'Only one featured post is allowed at a time. Unfeature the existing one first.' });
+      }
+    }
+
 
     const result = await new Promise((resolve, reject) => {
 
