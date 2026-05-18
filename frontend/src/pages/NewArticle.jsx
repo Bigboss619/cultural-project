@@ -128,7 +128,25 @@ const NewArticle = () => {
     setFormError('');
 
     const finalCategoryId = Number(categoryId);
+
+    const safeSummary = normalize(summary).trim();
+    const safeContent = normalize(content).trim();
+
+    // enforce the same rules backend validates, so user sees messages reliably
+    if (!safeSummary) {
+      setFormError('summary is required');
+      setFormSuccess('');
+      return;
+    }
+
+    if (!safeContent) {
+      setFormError('content is required');
+      setFormSuccess('');
+      return;
+    }
+
     const payload = {
+
       title: cleanTitle,
       category_id: Number.isFinite(finalCategoryId) ? finalCategoryId : categoryId,
       status,
