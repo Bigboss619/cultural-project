@@ -111,11 +111,18 @@ const NewArticle = () => {
     }
 
     const cleanTitle = title.trim();
-    if (!cleanTitle) return;
-    if (!categoryId) {
-      setFormError('Please select a category');
+    if (!cleanTitle) {
+      setFormError('Title is required');
+      setFormSuccess('');
       return;
     }
+
+    if (!categoryId) {
+      setFormError('Category is required');
+      setFormSuccess('');
+      return;
+    }
+
 
     setSaving(true);
     setFormError('');
