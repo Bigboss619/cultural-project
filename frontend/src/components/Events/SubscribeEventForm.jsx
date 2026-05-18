@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import axios from 'axios';
 
 function NewsletterIcon() {
   return (
@@ -19,20 +20,33 @@ function NewsletterIcon() {
       <path d="M4 4h16v16H4z" />
       <path d="m22 6-10 7L2 6" />
     </svg>
-  )
+  );
 }
 
 const SubscribeEventForm = () => {
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState('idle') // idle | success
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle'); // idle | success | error
+  const [errorMessage, setErrorMessage] = useState('');
 
-  function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSubmit(e) {
+    e.preventDefault();
 
-    // Mock submit (no backend wired yet)
-    if (!email.trim()) return
+    if (!email.trim()) return;
 
-    setStatus('success')
+    try {
+      setStatus('idle');
+      setErrorMessage('');
+
+      // Make API call to subscribe
+      await axios.post('/api/newsletter/subscribe', { email });
+
+      setStatus('success');
+      setEmail('');
+    } catch (err) {
+      console.error('Subscription failed:', err);
+      setStatus('error');
+      setErrorMessage(err?.response?.data?.message || 'Subscription failed. Please try again.');
+    }
   }
 
   return (
@@ -57,24 +71,34 @@ const SubscribeEventForm = () => {
               type="email"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value)
-                if (status !== 'idle') setStatus('idle')
+                setEmail(e.target.value);
+                if (status !== 'idle') {
+                  setStatus('idle');
+                  setErrorMessage('');
+                }
               }}
             />
 
             <button
               type="submit"
               className="px-6 py-3 bg-[#2D5016] text-white font-semibold rounded-lg hover:bg-[#1A3009] transition-colors duration-300 disabled:opacity-70"
-              disabled={!email.trim()}
+              disabled={!email.trim() || status === 'success'}
             >
               {status === 'success' ? 'Subscribed!' : 'Subscribe'}
             </button>
           </form>
+
+          {status === 'error' && errorMessage && (
+            <p className="mt-3 text-sm text-red-200">{errorMessage}</p>
+          )}
+
+          {status === 'success' && (
+            <p className="mt-3 text-sm text-green-200">Thank you for subscribing!</p>
+          )}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default SubscribeEventForm
-
+export default SubscribeEventForm;

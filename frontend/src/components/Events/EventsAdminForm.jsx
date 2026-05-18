@@ -1,36 +1,98 @@
-import React, { useMemo, useState } from 'react';
-import { EVENTS_ADMIN_DEFAULT_FORM } from './eventsAdminMockData';
-import { Plus, Trash2 } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Plus, Trash2, X } from 'lucide-react';
+import axios from 'axios';
+import { useToast } from '../toast/ToastProvider';
 
-export default function EventsAdminForm() {
-  const [form, setForm] = useState(EVENTS_ADMIN_DEFAULT_FORM);
-  const [status, setStatus] = useState({ type: 'idle', message: '' });
+const CATEGORIES = ['Festival', 'Competition', 'Workshop', 'Exhibition', 'Program', 'General'];
+
+const DEFAULT_FORM = {
+  title: '',
+  category: 'Festival',
+  location: '',
+  start_date: '',
+  end_date: '',
+  start_time: '',
+  end_time: '',
+  description: '',
+  banner_image: null,
+  status: 'draft',
+  rsvp_enabled: true,
+  rsvp_seats: 300,
+  ticket_links: [{ label: 'Register', url: '' }],
+};
+
+export default function EventsAdminForm({ event, onSuccess, onCancel }) {
+  const { showError, showSuccess } = useToast();
+
+  const isEdit = Boolean(event);
+
+  const getInitialForm = () => {
+    if (!event) return { ...DEFAULT_FORM };
+
+    return {
+      title: event.title || '',
+      category: event.category || 'Festival',
+      location: event.location || '',
+      start_date: event.start_date || '',
+      end_date: event.end_date || '',
+      start_time: event.start_time || '',
+      end_time: event.end_time || '',
+      description: event.description || '',
+      banner_image: event.banner_image || null,
+      status: event.status || 'draft',
+      rsvp_enabled: event.rsvp_enabled || false,
+      rsvp_seats: event.rsvp_seats || 300,
+      ticket_links: event.ticket_links?.length ? event.ticket_links : [{ label: 'Register', url: '' }],
+    };
+  };
+
+  const [form, setForm] = useState(getInitialForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    setForm(getInitialForm());
+    setFormError('');
+  }, [event]);
+
+  const authToken = localStorage.getItem('authToken');
 
   const timeValue = useMemo(() => {
-    if (!form.timeFrom && !form.timeTo) return '';
-    if (form.timeFrom && form.timeTo) return `${form.timeFrom} - ${form.timeTo}`;
-    return form.timeFrom || form.timeTo;
-  }, [form.timeFrom, form.timeTo]);
+    if (!form.start_time && !form.end_time) return '';
+    if (form.start_time && form.end_time) return `${form.start_time} - ${form.end_time}`;
+    return form.start_time || form.end_time;
+  }, [form.start_time, form.end_time]);
+
+  const isValidUrl = (url) => {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   function updateTicketLink(idx, patch) {
     setForm((prev) => {
-      const next = [...prev.ticketLinks];
+      const next = [...prev.ticket_links];
       next[idx] = { ...next[idx], ...patch };
-      return { ...prev, ticketLinks: next };
+      return { ...prev, ticket_links: next };
     });
   }
 
   function addTicketLink() {
     setForm((prev) => ({
       ...prev,
-      ticketLinks: [...prev.ticketLinks, { label: 'Ticket', url: '' }],
+      ticket_links: [...prev.ticket_links, { label: 'Ticket', url: '' }],
     }));
   }
 
   function removeTicketLink(idx) {
+    if (form.ticket_links.length <= 1) return;
     setForm((prev) => ({
       ...prev,
-      ticketLinks: prev.ticketLinks.filter((_, i) => i !== idx),
+      ticket_links: prev.ticket_links.filter((_, i) => i !== idx),
     }));
   }
 
@@ -43,36 +105,92 @@ export default function EventsAdminForm() {
   }
 
   function resetForm() {
-    setForm(EVENTS_ADMIN_DEFAULT_FORM);
-    setStatus({ type: 'idle', message: '' });
+    setForm({ ...DEFAULT_FORM });
+    setFormError('');
   }
 
-  function submitMock(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const title = form.title.trim();
     const location = form.location.trim();
-    const date = form.date.trim();
+    const start_date = form.start_date.trim();
 
-    if (!title || !location || !date) {
-      setStatus({ type: 'error', message: 'Please fill Title, Date, and Location.' });
+    if (!title || !location || !start_date) {
+      setFormError('Please fill Title, Date, and Location.');
       return;
     }
 
-    setStatus({
-      type: 'success',
-      message: 'Event created (mock). Connect to backend to persist changes.',
-    });
-  }
+    for (const t of form.ticket_links) {
+      if (t.url && !isValidUrl(t.url)) {
+        setFormError('Please enter valid URLs for ticket links.');
+        return;
+      }
+    }
+
+    setSubmitting(true);
+    setFormError('');
+
+    try {
+      const payload = {
+        title,
+        location,
+        start_date,
+        end_date: form.end_date || null,
+        start_time: form.start_time || null,
+        end_time: form.end_time || null,
+        description: form.description || '',
+        category: form.category,
+        banner_image: form.banner_image,
+        status: form.status,
+        rsvp_enabled: form.rsvp_enabled,
+        rsvp_seats: form.rsvp_seats,
+        ticket_links: form.ticket_links.filter(t => t.label || t.url),
+      };
+
+      let savedEvent;
+      let isNew = true;
+
+      if (isEdit) {
+        await axios.put(`/api/events/${event.id}`, payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        savedEvent = { ...event, ...payload };
+        isNew = false;
+        showSuccess('Event updated successfully');
+      } else {
+        const resp = await axios.post('/api/events', payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        savedEvent = { ...payload, id: resp.data.eventId };
+        showSuccess('Event created successfully');
+      }
+
+      onSuccess(savedEvent, isNew);
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to save event';
+      setFormError(msg);
+      showError(msg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="p-4 sm:p-6 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
-      <h2 className="text-xl font-bold mb-3">Create events</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-        Mock form (local state only). Includes banner, date/time, location, ticket links, and RSVP.
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">{isEdit ? 'Edit Event' : 'Create Event'}</h2>
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            <X size={20} />
+          </button>
+        )}
+      </div>
 
-      <form onSubmit={submitMock} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Banner */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
@@ -84,7 +202,7 @@ export default function EventsAdminForm() {
               className="block w-full text-sm text-gray-700 dark:text-gray-200"
             />
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Preview updates instantly (mock).
+              {isEdit ? 'Upload a new image to replace the current banner.' : 'Select an image file.'}
             </div>
           </div>
           <div className="border border-gray-200 dark:border-slate-700 rounded-lg p-3 flex items-center justify-center bg-gray-50/50 dark:bg-slate-900/30">
@@ -94,10 +212,16 @@ export default function EventsAdminForm() {
                 alt="Event banner preview"
                 className="w-full h-32 object-cover rounded"
               />
+            ) : form.banner_image ? (
+              <img
+                src={form.banner_image}
+                alt="Current banner"
+                className="w-full h-32 object-cover rounded"
+              />
             ) : (
               <div className="text-center">
-                <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">No banner selected</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Choose an image file</div>
+                <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">No banner</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Choose an image</div>
               </div>
             )}
           </div>
@@ -106,12 +230,13 @@ export default function EventsAdminForm() {
         {/* Core fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Event title</label>
+            <label className="block text-sm font-medium mb-2">Event title *</label>
             <input
               value={form.title}
               onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g. New Yam Festival"
+              required
             />
           </div>
 
@@ -122,56 +247,85 @@ export default function EventsAdminForm() {
               onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {['Festival', 'Competition', 'Workshop', 'Exhibition', 'Program'].map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Event date</label>
+            <label className="block text-sm font-medium mb-2">Start date *</label>
             <input
               type="date"
-              value={form.date}
-              onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))}
+              value={form.start_date}
+              onChange={(e) => setForm((prev) => ({ ...prev, start_date: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="e.g. August 10-12, 2026"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Time (from/to)</label>
-            <div className="flex gap-2">
-              <input
+            <label className="block text-sm font-medium mb-2">End date</label>
+            <input
+              type="date"
+              value={form.end_date}
+              onChange={(e) => setForm((prev) => ({ ...prev, end_date: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Start time</label>
+            <input
               type="time"
-                value={form.timeFrom}
-                onChange={(e) => setForm((prev) => ({ ...prev, timeFrom: e.target.value }))}
-                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g. 9:00 AM"
-              />
-              <input
+              value={form.start_time}
+              onChange={(e) => setForm((prev) => ({ ...prev, start_time: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">End time</label>
+            <input
               type="time"
-                value={form.timeTo}
-                onChange={(e) => setForm((prev) => ({ ...prev, timeTo: e.target.value }))}
-                className="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g. 7:00 PM"
-              />
-            </div>
-            {timeValue ? (
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Preview: {timeValue}</div>
-            ) : null}
+              value={form.end_time}
+              onChange={(e) => setForm((prev) => ({ ...prev, end_time: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium mb-2">Event location</label>
+            <label className="block text-sm font-medium mb-2">Location *</label>
             <input
               value={form.location}
               onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g. Oyo Heritage Grounds, Ibadan"
+              required
             />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-2">Description</label>
+            <textarea
+              value={form.description}
+              onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Brief description of the event..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Status</label>
+            <select
+              value={form.status}
+              onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
           </div>
         </div>
 
@@ -182,7 +336,7 @@ export default function EventsAdminForm() {
             <button
               type="button"
               onClick={addTicketLink}
-              className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-transparent hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2"
+              className="px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-transparent hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2 text-sm"
             >
               <Plus size={16} />
               Add link
@@ -190,7 +344,7 @@ export default function EventsAdminForm() {
           </div>
 
           <div className="space-y-3">
-            {form.ticketLinks.map((t, idx) => (
+            {form.ticket_links.map((t, idx) => (
               <div key={idx} className="flex flex-col md:flex-row gap-2 md:items-start">
                 <input
                   value={t.label}
@@ -207,7 +361,8 @@ export default function EventsAdminForm() {
                 <button
                   type="button"
                   onClick={() => removeTicketLink(idx)}
-                  className="p-2 mt-1 md:mt-0 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+                  className="p-2 mt-1 md:mt-0 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-30"
+                  disabled={form.ticket_links.length <= 1}
                   aria-label="Remove ticket link"
                   title="Remove"
                 >
@@ -224,14 +379,14 @@ export default function EventsAdminForm() {
             <div>
               <div className="text-sm font-semibold">RSVP system</div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Toggle RSVP and set a mock seat limit.
+                Allow attendees to RSVP and track capacity.
               </div>
             </div>
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
-                checked={form.rsvpEnabled}
-                onChange={(e) => setForm((prev) => ({ ...prev, rsvpEnabled: e.target.checked }))}
+                checked={form.rsvp_enabled}
+                onChange={(e) => setForm((prev) => ({ ...prev, rsvp_enabled: e.target.checked }))}
                 className="w-4 h-4"
               />
               <span className="text-sm">Enabled</span>
@@ -243,28 +398,31 @@ export default function EventsAdminForm() {
             <input
               type="number"
               min={1}
-              value={form.rsvpSeats}
-              onChange={(e) => setForm((prev) => ({ ...prev, rsvpSeats: Number(e.target.value) }))}
-              disabled={!form.rsvpEnabled}
+              value={form.rsvp_seats}
+              onChange={(e) => setForm((prev) => ({ ...prev, rsvp_seats: Number(e.target.value) }))}
+              disabled={!form.rsvp_enabled}
               className="mt-2 w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
-        {status.type !== 'idle' ? (
-          <div
-            className={
-              status.type === 'success'
-                ? 'p-3 rounded-lg bg-green-50 border border-green-200 text-green-800'
-                : 'p-3 rounded-lg bg-red-50 border border-red-200 text-red-800'
-            }
-          >
-            {status.message}
+        {formError ? (
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-800">
+            {formError}
           </div>
         ) : null}
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 justify-end">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-transparent hover:bg-gray-50 dark:hover:bg-slate-700"
+            >
+              Cancel
+            </button>
+          )}
           <button
             type="button"
             onClick={resetForm}
@@ -274,13 +432,13 @@ export default function EventsAdminForm() {
           </button>
           <button
             type="submit"
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            disabled={submitting}
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
           >
-            Create event (mock)
+            {submitting ? 'Saving...' : isEdit ? 'Update Event' : 'Create Event'}
           </button>
         </div>
       </form>
     </div>
   );
 }
-

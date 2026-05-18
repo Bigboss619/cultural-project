@@ -10,6 +10,8 @@ const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const postRoutes = require('./routes/postRoutes');
 const postPublicRoutes = require('./routes/postPublicRoutes');
+const eventRoutes = require('./routes/eventRoutes');
+const eventPublicRoutes = require('./routes/eventPublicRoutes');
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/public/posts', postPublicRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/public/events', eventPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 
