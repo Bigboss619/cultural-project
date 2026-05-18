@@ -1,27 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 
-const initialCategories = [
-  { id: 1, name: 'Festivals', description: 'Seasonal events, celebrations, and traditions', posts: 45 },
-  { id: 2, name: 'Traditional Attire', description: 'Clothing, textiles, and regional fashion', posts: 32 },
-  { id: 3, name: 'Food', description: 'Cuisine, ingredients, and cultural dishes', posts: 28 },
-  { id: 4, name: 'History', description: 'Origins, timelines, and cultural milestones', posts: 51 },
-  { id: 5, name: 'Language', description: 'Scripts, words, and multilingual heritage', posts: 24 },
-  { id: 6, name: 'Dance', description: 'Performances, styles, and choreography', posts: 37 },
-  { id: 7, name: 'Music', description: 'Instruments, rhythms, and musical traditions', posts: 30 },
-  { id: 8, name: 'Religion', description: 'Beliefs, rituals, and cultural practices', posts: 22 },
-];
-
 const initialFeatures = [
-  { id: 1, title: 'Curated taxonomy', description: 'Organize content with clear, meaningful categories.' },
-  { id: 2, title: 'Fast navigation', description: 'Find topics quickly across posts and resources.' },
-  { id: 3, title: 'Admin tools', description: 'Add, edit, or remove categories with mock CRUD actions.' },
+  {
+    id: 1,
+    title: 'Curated taxonomy',
+    description: 'Organize content with clear, meaningful categories.',
+  },
+  {
+    id: 2,
+    title: 'Fast navigation',
+    description: 'Find topics quickly across posts and resources.',
+  },
+  {
+    id: 3,
+    title: 'Admin tools',
+    description: 'Add, edit, or remove categories.',
+  },
 ];
 
 const Categories = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -31,16 +35,56 @@ const Categories = () => {
 
   const [editId, setEditId] = useState(null);
 
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
   const filteredCategories = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return categories;
+
     return categories.filter((c) => {
       return (
-        c.name.toLowerCase().includes(q) ||
+        (c.name || '').toLowerCase().includes(q) ||
         (c.description || '').toLowerCase().includes(q)
       );
     });
   }, [categories, searchQuery]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        if (!authToken) {
+          setError('Not authenticated. Please log in again.');
+          setLoading(false);
+          return;
+        }
+
+        const resp = await axios.get('/api/categories', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        const list = resp?.data?.categories || [];
+        if (isMounted) setCategories(list);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err?.response?.data?.message || 'Failed to load categories');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchCategories();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authToken]);
 
   const openAdd = () => {
     setFormName('');
@@ -50,7 +94,7 @@ const Categories = () => {
   };
 
   const openEdit = (cat) => {
-    setFormName(cat.name);
+    setFormName(cat.name || '');
     setFormDescription(cat.description || '');
     setEditId(cat.id);
     setIsEditOpen(true);
@@ -62,40 +106,87 @@ const Categories = () => {
     setEditId(null);
   };
 
-  const upsertCategory = () => {
+  const refreshCategories = async () => {
+    const resp = await axios.get('/api/categories', {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+    setCategories(resp?.data?.categories || []);
+  };
+
+  const upsertCategory = async () => {
     const name = formName.trim();
     const description = formDescription.trim();
 
     if (!name) return;
-
-    if (editId == null) {
-      const nextId = categories.length ? Math.max(...categories.map((c) => c.id)) + 1 : 1;
-      const newCat = {
-        id: nextId,
-        name,
-        description: description || '—',
-        posts: 0,
-      };
-      setCategories((prev) => [newCat, ...prev]);
-    } else {
-      setCategories((prev) =>
-        prev.map((c) =>
-          c.id === editId
-            ? { ...c, name, description: description || '—' }
-            : c
-        )
-      );
+    if (!authToken) {
+      setError('Not authenticated. Please log in again.');
+      return;
     }
 
-    closeModal();
+    try {
+      setLoading(true);
+      setError('');
+
+      if (editId == null) {
+        await axios.post(
+          '/api/categories',
+          { name, description },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+      } else {
+        await axios.put(
+          `/api/categories/${editId}`,
+          { name, description },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+      }
+
+      await refreshCategories();
+      closeModal();
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to save category');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteCategory = (cat) => {
+  const deleteCategory = async (cat) => {
     const ok = window.confirm(`Delete category “${cat.name}”?`);
     if (!ok) return;
-    setCategories((prev) => prev.filter((c) => c.id !== cat.id));
 
-    if (isEditOpen && editId === cat.id) closeModal();
+    if (!authToken) {
+      setError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      await axios.delete(`/api/categories/${cat.id}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      await refreshCategories();
+
+      if (isEditOpen && editId === cat.id) closeModal();
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to delete category');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -128,12 +219,28 @@ const Categories = () => {
           </div>
         </div>
 
+        {/* Feedback */}
+        {loading && (
+          <div className="rounded-lg border border-gray-200 dark:border-slate-700 p-4 text-sm">
+            Loading categories...
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="rounded-lg border border-red-200 dark:border-red-900/50 p-4 text-sm text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20">
+            {error}
+          </div>
+        )}
+
         {/* Features */}
         <div className="p-4 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
           <h2 className="text-xl font-bold mb-3">Features</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {initialFeatures.map((f) => (
-              <div key={f.id} className="p-3 rounded-lg bg-gray-50/70 dark:bg-slate-900/30 border border-gray-200/60 dark:border-slate-700">
+              <div
+                key={f.id}
+                className="p-3 rounded-lg bg-gray-50/70 dark:bg-slate-900/30 border border-gray-200/60 dark:border-slate-700"
+              >
                 <div className="font-semibold">{f.title}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">{f.description}</div>
               </div>
@@ -173,29 +280,23 @@ const Categories = () => {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-500 dark:text-gray-400">{cat.posts} posts</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{cat.posts ?? 0} posts</p>
             </div>
           ))}
         </div>
 
-        {filteredCategories.length === 0 && (
-          <div className="text-center text-gray-600 dark:text-gray-400 py-10">
-            No categories found.
-          </div>
+        {!loading && !error && filteredCategories.length === 0 && (
+          <div className="text-center text-gray-600 dark:text-gray-400 py-10">No categories found.</div>
         )}
 
-        {/* Add Modal */}
+        {/* Add/Edit Modal */}
         {(isAddOpen || isEditOpen) && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             <div className="w-full max-w-lg rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-5">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div className="text-lg font-bold">
-                    {isEditOpen ? 'Edit category' : 'Add category'}
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Mock CRUD actions (local state only).
-                  </div>
+                  <div className="text-lg font-bold">{isEditOpen ? 'Edit category' : 'Add category'}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Editable and deletable via backend</div>
                 </div>
                 <button
                   onClick={closeModal}
@@ -236,7 +337,8 @@ const Categories = () => {
                   </button>
                   <button
                     onClick={upsertCategory}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    disabled={loading}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-60"
                   >
                     {isEditOpen ? 'Save changes' : 'Add category'}
                   </button>

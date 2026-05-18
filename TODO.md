@@ -1,12 +1,34 @@
-- [x] Backend: implement GET /api/users (requireAuth) in backend/controllers/userController.js
+# TODO - Categories Backend + Frontend
 
-- [x] Backend: define backend/routes/userRoutes.js with route to controller
+- [x] Implement backend controller: `backend/controllers/categoryController.js`
+  - [ ] GET all categories
+  - [ ] GET category by id
+  - [ ] POST create category (slugify name)
+  - [ ] PUT/PATCH update category (slugify if name changes)
+  - [ ] DELETE category
 
-- [x] Backend: mount userRoutes in backend/server.js under /api
 
-- [x] Frontend: update frontend/src/pages/Users.jsx to fetch users from GET /api/users using authToken from localStorage
+- [x] Implement backend routes: `backend/routes/categoryRoutes.js`
+  - [x] Protect GET/POST/PUT/PATCH/DELETE with `requireAuth`
 
-- [x] Frontend: add loading/error UI states for the Users page
 
-- [ ] Backend/Frontend: quick manual test (run both servers, login, open /admin/users)
+
+- [x] Mount routes in `backend/server.js`
+  - [x] `app.use('/api/categories', categoryRoutes)`
+
+
+- [x] Update frontend page: `frontend/src/pages/Categories.jsx`
+  - [x] Replace mock state with API calls
+  - [x] Wire Add/Edit/Delete to backend endpoints
+  - [x] Add loading + error states
+  - [x] Keep search + modals UI
+
+
+
+- [x] Run & verify
+  - [ ] Start backend
+  - [ ] Start frontend
+  - [ ] Test `/admin/categories` CRUD end-to-end
+
+
 
