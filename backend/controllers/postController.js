@@ -69,7 +69,7 @@
             p.content,
             p.featured_image,
             p.featured,
-
+            p.summary,
             p.category_id,
             p.user_id,
             p.status,

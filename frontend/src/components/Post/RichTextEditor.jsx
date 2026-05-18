@@ -1,13 +1,11 @@
 // components/RichTextEditor.jsx - FIXED VERSION
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-// ❌ REMOVED: import Underline from '@tiptap/extension-underline'; 
 import TextAlign from '@tiptap/extension-text-align';
 import {
   Bold,
   Italic,
-  // ❌ REMOVED: Underline as UnderlineIcon,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -19,6 +17,8 @@ import {
 } from 'lucide-react';
 
 const RichTextEditor = ({ content, onUpdate, placeholder = "Start typing...", height = "300px" }) => {
+  const editorRef = useRef(null);
+  const lastSyncedContentRef = useRef(null);
   const editor = useEditor({
     extensions: [
       StarterKit, // ✅ Already includes underline!
@@ -36,6 +36,16 @@ const RichTextEditor = ({ content, onUpdate, placeholder = "Start typing...", he
       },
     },
   });
+  editorRef.current = editor;
+
+  useEffect(() => {
+    if(!editor || !content) return;
+      
+    const editorHTML = editor.getHTML();
+    if(editorHTML !== content) {
+      editor.commands.setContent(content);
+    }
+  }, [editor, content]);
 
   if (!editor) {
     return (
