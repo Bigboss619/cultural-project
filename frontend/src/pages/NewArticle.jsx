@@ -6,13 +6,14 @@ import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import RichTextEditor from '../components/Post/RichTextEditor';
 import { useToast } from '../components/toast';
 
-
-
 const normalize = (s) => (s == null ? '' : String(s));
+
 
 const NewArticle = () => {
   const navigate = useNavigate();
   const { mode, id } = useParams();
+  const { showError } = useToast();
+
 
   const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
@@ -39,10 +40,12 @@ const NewArticle = () => {
   const fetchCategories = async () => {
     if (!authToken) {
       setCategoriesError('Not authenticated. Please log in again.');
+      showError('Not authenticated. Please log in again.');
       return;
     }
 
     try {
+
       setCategoriesLoading(true);
       setCategoriesError('');
 
@@ -148,14 +151,17 @@ const NewArticle = () => {
 
     // enforce the same rules backend validates, so user sees messages reliably
     if (summaryIsEmpty) {
+      showError('summary is required');
       setFormError('summary is required');
       return;
     }
 
     if (contentIsEmpty) {
+      showError('content is required');
       setFormError('content is required');
       return;
     }
+
 
 
 
@@ -195,12 +201,16 @@ const NewArticle = () => {
         err?.response?.data?.errors?.[0]?.message ||
         err?.message ||
         'Failed to save post';
+
+      showError(msg);
+
       // prevent stale success banner
       setFormSuccess('');
       setFormError(msg);
 
       console.error('Save post failed:', err?.response?.data || err);
     } finally {
+
       setSaving(false);
     }
   };
