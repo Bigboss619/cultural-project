@@ -135,13 +135,13 @@ async function getPostById(req, res) {
     return res.status(500).json({ message: 'Failed to fetch post', error: err.message });
   }
 }
-
 // POST /api/posts
 async function createPost(req, res) {
   try {
     const {
       title,
       content,
+      summary,
       featured_image,
       category_id,
       status = 'draft',
@@ -159,6 +159,7 @@ async function createPost(req, res) {
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
 
     const finalContent = String(content || '').trim();
+    const finalSummary = String(summary || '').trim();
     const finalFeaturedImage = featured_image ? String(featured_image) : null;
 
     const userId = req.user?.userId || req.user?.id;
@@ -176,9 +177,9 @@ async function createPost(req, res) {
     const row = await new Promise((resolve, reject) => {
       db.query(
         `INSERT INTO posts
-          (title, slug, content, featured_image, featured, category_id, user_id, status, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [finalTitle, finalSlug, finalContent, finalFeaturedImage, status === 'published' ? (Boolean(req.body?.featured) ? 1 : 0) : 0, finalCategoryId, userId, finalStatus],
+          (title, slug, summary content, featured_image, featured, category_id, user_id, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [finalTitle, finalSlug, finalSummary, finalContent, finalFeaturedImage, status === 'published' ? (Boolean(req.body?.featured) ? 1 : 0) : 0, finalCategoryId, userId, finalStatus],
         (err, result) => {
           if (err) return reject(err);
           resolve(result);

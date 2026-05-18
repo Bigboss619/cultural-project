@@ -28,6 +28,8 @@ const NewArticle = () => {
   const [content, setContent] = useState('<p></p>');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+  const [formSuccess, setFormSuccess] = useState('');
+
 
 
 
@@ -143,8 +145,10 @@ const NewArticle = () => {
         });
       }
 
+      setFormSuccess(isEdit ? 'Post updated successfully' : 'Post created successfully');
       navigate('/admin/posts');
     } catch (err) {
+
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -161,6 +165,17 @@ const NewArticle = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {formError && (
+          <div className="p-3 rounded-lg bg-red-50 text-red-700 border border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40">
+            {formError}
+          </div>
+        )}
+        {formSuccess && (
+          <div className="p-3 rounded-lg bg-green-50 text-green-700 border border-green-100 dark:bg-green-900/20 dark:text-green-200 dark:border-green-900/40">
+            {formSuccess}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">
