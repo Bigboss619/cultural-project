@@ -34,7 +34,10 @@ const NewArticle = () => {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
 
-
+  // TipTap editors re-render only when `content` prop changes.
+  // Keep stable HTML strings so Edit mode correctly shows summary/content.
+  const summaryHtml = useMemo(() => normalize(summary), [summary]);
+  const contentHtml = useMemo(() => normalize(content), [content]);
 
 
   const fetchCategories = async () => {
@@ -83,8 +86,8 @@ const NewArticle = () => {
       setFeatured(Boolean(p.featured));
 
       // backend returns derived summary for compatibility (first 160 chars)
-      setSummary(normalize(p.summary) || '<p></p>');
-      setContent(normalize(p.content) || '<p></p>');
+      setSummary(normalize(p.summary));
+      setContent(normalize(p.content));
     } catch (err) {
       setFormError(err?.response?.data?.message || 'Failed to load post');
     }
@@ -140,10 +143,24 @@ const NewArticle = () => {
 
     // guard: RichTextEditor sometimes keeps placeholders like <p></p>
     // Treat them as empty for validation.
-    const isEmptyHtml = (s) => {
-      const t = String(s || '').replace(/\s+/g, '').toLowerCase();
-      return t === '' || t === '<p></p>' || t === '<p/>' || t === '<br/>';
+  const isEmptyHtml = (s) => {
+      const t = String(s || '')
+        .replace(/\s+/g, '')
+        .toLowerCase();
+
+      // editor can output variations when user deletes everything
+      return (
+        t === '' ||
+        t === '<p></p>' ||
+        t === '<p/>' ||
+        t === '<br/>' ||
+        t === '<p><br></p>' ||
+        t === '<p><br/></p>' ||
+        t === '<div></div>' ||
+        t === '<div><br></div>'
+      );
     };
+
 
     const summaryIsEmpty = isEmptyHtml(safeSummary);
     const contentIsEmpty = isEmptyHtml(safeContent);
@@ -335,8 +352,9 @@ const NewArticle = () => {
             <div>
               <label className="block text-sm font-semibold mb-3">Article Summary</label>
               <RichTextEditor
-                content={summary}
+                content={summaryHtml}
                 onUpdate={setSummary}
+
                 placeholder="Write a brief summary of your article..."
                 height="250px"
               />

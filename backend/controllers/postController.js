@@ -106,7 +106,9 @@ async function getPostById(req, res) {
           p.title,
           p.slug,
           p.content,
+          p.summary,
           p.featured_image,
+          p.featured,
           p.category_id,
           p.user_id,
           p.status,
@@ -163,7 +165,7 @@ async function createPost(req, res) {
 
     const finalSummary = String(summary || '').trim();
     if(!finalSummary) return res.status(400).json({ message: 'summary is required' });
-    
+
     const finalFeaturedImage = featured_image ? String(featured_image) : null;
 
     const userId = req.user?.userId || req.user?.id;
@@ -204,6 +206,7 @@ async function updatePost(req, res) {
 
     const {
       title,
+      summary,
       content,
       featured_image,
       category_id,
