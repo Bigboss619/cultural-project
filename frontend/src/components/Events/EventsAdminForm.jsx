@@ -3,11 +3,9 @@ import { Plus, Trash2, X } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '../toast/ToastProvider';
 
-const CATEGORIES = ['Festival', 'Competition', 'Workshop', 'Exhibition', 'Program', 'General'];
-
 const DEFAULT_FORM = {
   title: '',
-  category: 'Festival',
+  category: '',
   location: '',
   start_date: '',
   end_date: '',
@@ -49,13 +47,46 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
   const [form, setForm] = useState(getInitialForm);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  const authToken = localStorage.getItem('authToken');
+
+  // Fetch categories from database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!authToken) {
+        setCategoriesLoading(false);
+        return;
+      }
+
+      try {
+        const resp = await axios.get('/api/categories', {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        setCategories(resp.data?.categories || []);
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [authToken]);
 
   useEffect(() => {
     setForm(getInitialForm());
     setFormError('');
   }, [event]);
 
-  const authToken = localStorage.getItem('authToken');
+  // Set default category once categories are loaded
+  useEffect(() => {
+    if (!categoriesLoading && categories.length > 0 && !form.category) {
+      setForm(prev => ({ ...prev, category: categories[0].name }));
+    }
+  }, [categories, categoriesLoading, form.category]);
 
   const timeValue = useMemo(() => {
     if (!form.start_time && !form.end_time) return '';
@@ -246,10 +277,17 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
               value={form.category}
               onChange={(e) => setForm((prev) => ({ ...prev, category: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={categoriesLoading}
             >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
+              {categoriesLoading ? (
+                <option value="">Loading...</option>
+              ) : categories.length === 0 ? (
+                <option value="">No categories</option>
+              ) : (
+                categories.map((c) => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))
+              )}
             </select>
           </div>
 

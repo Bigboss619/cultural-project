@@ -1,3 +1,4 @@
+const db = require('../config/config');
 const express = require('express');
 const {
   rsvpEvent,
@@ -10,7 +11,7 @@ const router = express.Router();
 // GET /api/public/events - Get all published events for public website
 router.get('/', async (req, res) => {
   try {
-    const db = require('../config/config');
+    // const db = require('../config/config');
 
     const rows = await new Promise((resolve, reject) => {
       db.query(
