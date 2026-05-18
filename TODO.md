@@ -1,21 +1,24 @@
-# TODO
+# TODO - Posts (backend connected) 
 
-- [x] Implement backend posts CRUD in `backend/controllers/postController.js`
+## Step 1
+- Update `frontend/src/pages/Posts.jsx`:
+  - Remove modal usage (PostEditorModal)
+  - “New Article” navigates to `/admin/posts/new`
+  - “Edit” navigates to `/admin/posts/edit/:id`
 
-- [x] Implement `backend/routes/postRoutes.js` endpoints (GET/POST/PUT/DELETE) with `requireAuth`
+## Step 2
+- Update `frontend/src/pages/NewArticle.jsx`:
+  - Remove localStorage mock logic
+  - Load categories from `/api/categories` (auth)
+  - If `mode === 'edit'`, fetch post by id from `/api/posts/:id` (auth) and prefill the form
+  - On save:
+    - create: `POST /api/posts`
+    - edit: `PUT /api/posts/:id`
+  - Navigate back to `/admin/posts` after success
 
-- [x] Wire posts routes in `backend/server.js` under `/api/posts`
+## Step 3
+- Ensure `frontend/src/pages/Posts.jsx` still supports delete + publish via backend.
 
-- [ ] Connect `frontend/src/pages/Posts.jsx` to backend (fetch posts, delete, edit, publish)
-- [ ] Update `frontend/src/components/Post/PostEditorModal.jsx` to:
-  - [ ] fetch categories dynamically from `/api/categories`
-  - [ ] use `category_id` in payload
-  - [ ] call backend for create/update
-- [ ] Ensure delete works end-to-end from Posts list
-- [ ] Run backend + frontend and verify list/create/edit/delete flows
-- [x] Confirm editor/category dropdown uses backend (not hardcoded)
-- [x] Backend posts CRUD + /api/posts wiring
-
-
-
+## Step 4
+- Run frontend + backend and manually test create/edit/publish/delete.
 

@@ -1,21 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { FeaturedPostsPanel, PostsFeatures, PostsList, PostsToolbar } from '../components/Post';
 
 import { INITIAL_FEATURES } from '../components/Post/mockPostsData';
-import { PostEditorModal } from '../components/Post';
-import { useNavigate } from 'react-router-dom';
 
 const Posts = () => {
   const [articles, setArticles] = useState([]);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState('create');
-  const [editId, setEditId] = useState(null);
-
   const [searchQuery, setSearchQuery] = useState('');
-
   const [filter, setFilter] = useState('all'); // all | published | draft
 
   const navigate = useNavigate();
@@ -53,9 +46,7 @@ const Posts = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 
-
   const filteredArticles = useMemo(() => {
-
     const q = searchQuery.trim().toLowerCase();
 
     let next = articles;
@@ -73,7 +64,6 @@ const Posts = () => {
       });
     }
 
-    // newest first
     next = [...next].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
     return next;
@@ -86,68 +76,31 @@ const Posts = () => {
   }, [articles]);
 
   const openCreate = () => {
-    setModalMode('create');
-    setEditId(null);
-    setIsModalOpen(true);
+    navigate('/admin/posts/new');
   };
 
   const openEdit = (article) => {
-    setModalMode('edit');
-    setEditId(article.id);
-    setIsModalOpen(true);
+    navigate(`/admin/posts/edit/${article.id}`);
   };
 
-
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditId(null);
-  };
-
-  const editorInitialData = useMemo(() => {
-    if (modalMode === 'edit') {
-      return articles.find((a) => a.id === editId);
-    }
-    return null;
-  }, [articles, modalMode, editId]);
-
-  const upsertArticle = async (payload) => {
+  const deleteArticle = async (article) => {
     if (!authToken) {
       setPostsError('Not authenticated. Please log in again.');
       return;
     }
 
-    try {
-      setPostsError('');
-
-      if (modalMode === 'create') {
-        await axios.post('/api/posts', payload, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-      } else {
-        await axios.put(`/api/posts/${editId}`, payload, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-      }
-
-      closeModal();
-      await fetchPosts();
-    } catch (err) {
-      setPostsError(err?.response?.data?.message || 'Failed to save post');
-    }
-  };
-
-
-
-
-
-  const deleteArticle = (article) => {
     const ok = window.confirm(`Delete article “${article.title}”?`);
     if (!ok) return;
 
-    setArticles((prev) => prev.filter((a) => a.id !== article.id));
+    try {
+      await axios.delete(`/api/posts/${article.id}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
 
-    if (modalMode === 'edit' && editId === article.id) closeModal();
+      await fetchPosts();
+    } catch (err) {
+      setPostsError(err?.response?.data?.message || 'Failed to delete post');
+    }
   };
 
   const publishArticle = async (article) => {
@@ -159,7 +112,6 @@ const Posts = () => {
     try {
       setPostsError('');
 
-      // ensure featured toggle is persisted (backend uses `featured` boolean)
       await axios.put(
         `/api/posts/${article.id}`,
         {
@@ -203,7 +155,6 @@ const Posts = () => {
           onCreateClick={openCreate}
         />
 
-        {/* Draft system */}
         <div className="flex flex-wrap items-center gap-2">
           {[
             { key: 'all', label: 'All' },
@@ -224,6 +175,12 @@ const Posts = () => {
           ))}
         </div>
 
+        {postsError && (
+          <div className="p-3 rounded-lg bg-red-50 text-red-700 border border-red-100 dark:bg-red-900/20 dark:text-red-200 dark:border-red-900/40">
+            {postsError}
+          </div>
+        )}
+
         <PostsList
           posts={filteredArticles}
           filter={filter}
@@ -240,22 +197,11 @@ const Posts = () => {
             Use Edit on a featured item to adjust its content, category, status, or featured flag.
           </p>
         </div>
-
-        {/* Editor Modal */}
-        {isModalOpen && (
-          <PostEditorModal
-            isOpen={isModalOpen}
-            mode={modalMode}
-            initialData={editorInitialData}
-            onClose={closeModal}
-            onSave={upsertArticle}
-          />
-        )}
       </div>
     </AdminLayout>
   );
 };
 
-
 export default Posts;
+
 

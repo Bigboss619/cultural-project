@@ -1,83 +1,152 @@
-// NewArticle.jsx - SIMPLIFIED VERSION
-import React, { useEffect, useState } from 'react';
+// NewArticle.jsx - Backend-connected version
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import RichTextEditor from '../components/Post/RichTextEditor'; // ✅ New component
-import { INITIAL_FEATURES, INITIAL_POSTS } from '../components/Post/mockPostsData';
+import RichTextEditor from '../components/Post/RichTextEditor';
 
 const normalize = (s) => (s == null ? '' : String(s));
-
-const storageKey = 'admin-mock-posts';
-
-const loadArticles = () => {
-  try {
-    const raw = localStorage.getItem(storageKey);
-    return raw ? JSON.parse(raw) : INITIAL_POSTS;
-  } catch {
-    return INITIAL_POSTS;
-  }
-};
-
-const saveArticles = (articles) => {
-  localStorage.setItem(storageKey, JSON.stringify(articles));
-};
 
 const NewArticle = () => {
   const navigate = useNavigate();
   const { mode, id } = useParams();
 
-  const [articles, setArticles] = useState(loadArticles());
-  const editing = id ? articles.find(a => a.id === Number(id)) : null;
+  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
-  const categories = ['History', 'Festivals', 'Traditional Attire', 'Food', 'Language', 'Dance', 'Music', 'Religion'];
+  const isEdit = mode === 'edit' && Boolean(id);
 
-  // Form state
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [categoriesError, setCategoriesError] = useState('');
+
+  // Form state (API shape)
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState(categories[0]);
+  const [categoryId, setCategoryId] = useState(null);
   const [status, setStatus] = useState('draft');
   const [featured, setFeatured] = useState(false);
   const [summary, setSummary] = useState('<p></p>');
   const [content, setContent] = useState('<p></p>');
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+
+
+
+  const fetchCategories = async () => {
+    if (!authToken) {
+      setCategoriesError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    try {
+      setCategoriesLoading(true);
+      setCategoriesError('');
+
+      const resp = await axios.get('/api/categories', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      setCategories(resp?.data?.categories || []);
+    } catch (err) {
+      setCategoriesError(err?.response?.data?.message || 'Failed to load categories');
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  const fetchPost = async (postId) => {
+    if (!authToken) {
+      setFormError('Not authenticated. Please log in again.');
+      return;
+    }
+
+    try {
+      setFormError('');
+
+      const resp = await axios.get(`/api/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      const p = resp?.data?.post;
+      if (!p) return;
+
+      setTitle(normalize(p.title));
+      setCategoryId(p.category_id ?? null);
+      setStatus(normalize(p.status) || 'draft');
+      setFeatured(Boolean(p.featured));
+
+      // backend returns derived summary for compatibility (first 160 chars)
+      setSummary(normalize(p.summary) || '<p></p>');
+      setContent(normalize(p.content) || '<p></p>');
+    } catch (err) {
+      setFormError(err?.response?.data?.message || 'Failed to load post');
+    }
+  };
 
   useEffect(() => {
-    if (editing) {
-      setTitle(editing.title || '');
-      setCategory(editing.category || categories[0]);
-      setStatus(editing.status || 'draft');
-      setFeatured(editing.featured || false);
-      setSummary(editing.summary || '<p></p>');
-      setContent(editing.content || '<p></p>');
+    fetchCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authToken]);
+
+  useEffect(() => {
+    if (!isEdit) return;
+    fetchPost(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, id, authToken]);
+
+  // Default category once categories arrive (create mode only)
+  useEffect(() => {
+    if (!categories?.length) return;
+    if (isEdit) return; // keep fetched categoryId
+    if (categoryId == null) {
+      setCategoryId(categories[0].id);
     }
-  }, [editing, categories]);
+  }, [categories, categoryId, isEdit]);
 
-  const handleSave = () => {
-    if (!title.trim()) return;
+  const handleSave = async () => {
+    if (!authToken) {
+      setFormError('Not authenticated. Please log in again.');
+      return;
+    }
 
-    const now = new Date().toISOString();
-    const newArticle = {
-      id: editing?.id || Date.now(),
-      title: title.trim(),
-      category,
+    const cleanTitle = title.trim();
+    if (!cleanTitle) return;
+    if (!categoryId) {
+      setFormError('Please select a category');
+      return;
+    }
+
+    setSaving(true);
+    setFormError('');
+
+    const payload = {
+      title: cleanTitle,
+      category_id: categoryId,
       status,
-      featured: status === 'published' ? featured : false,
-      summary,
-      content,
-      updatedAt: now,
+      featured: status === 'published' ? Boolean(featured) : false,
+      featured_image: null,
+      summary: normalize(summary).trim() || '—',
+      content: normalize(content).trim() || '—',
     };
 
-    setArticles(prev => {
-      let next;
-      if (editing) {
-        next = prev.map(a => a.id === editing.id ? newArticle : a);
+    try {
+      if (isEdit) {
+        await axios.put(`/api/posts/${id}`, payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
       } else {
-        next = [newArticle, ...prev];
+        await axios.post('/api/posts', payload, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
       }
-      saveArticles(next);
-      return next;
-    });
 
-    navigate('/admin/posts');
+      navigate('/admin/posts');
+    } catch (err) {
+      setFormError(err?.response?.data?.message || 'Failed to save post');
+    } finally {
+      setSaving(false);
+    }
   };
+
 
   return (
     <AdminLayout>
@@ -113,14 +182,21 @@ const NewArticle = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Category</label>
                   <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    value={categoryId ?? ''}
+                    onChange={(e) => setCategoryId(Number(e.target.value))}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500"
                   >
-                    {categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
+                    {categoriesLoading ? (
+                      <option value="" disabled>Loading...</option>
+                    ) : (
+                      categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))
+                    )}
                   </select>
+
                 </div>
 
                 <div>
