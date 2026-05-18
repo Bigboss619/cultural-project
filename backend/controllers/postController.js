@@ -177,7 +177,7 @@ async function createPost(req, res) {
     const row = await new Promise((resolve, reject) => {
       db.query(
         `INSERT INTO posts
-          (title, slug, summary content, featured_image, featured, category_id, user_id, status, created_at)
+          (title, slug, summary, content, featured_image, featured, category_id, user_id, status, created_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
         [finalTitle, finalSlug, finalSummary, finalContent, finalFeaturedImage, status === 'published' ? (Boolean(req.body?.featured) ? 1 : 0) : 0, finalCategoryId, userId, finalStatus],
         (err, result) => {
