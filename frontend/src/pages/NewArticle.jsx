@@ -135,18 +135,28 @@ const NewArticle = () => {
     const safeSummary = normalize(summary).trim();
     const safeContent = normalize(content).trim();
 
+    // guard: RichTextEditor sometimes keeps placeholders like <p></p>
+    // Treat them as empty for validation.
+    const isEmptyHtml = (s) => {
+      const t = String(s || '').replace(/\s+/g, '').toLowerCase();
+      return t === '' || t === '<p></p>' || t === '<p/>' || t === '<br/>';
+    };
+
+    const summaryIsEmpty = isEmptyHtml(safeSummary);
+    const contentIsEmpty = isEmptyHtml(safeContent);
+
+
     // enforce the same rules backend validates, so user sees messages reliably
-    if (!safeSummary) {
-      // Toast user-friendly message
+    if (summaryIsEmpty) {
       setFormError('summary is required');
       return;
     }
 
-    if (!safeContent) {
-      // Toast user-friendly message
+    if (contentIsEmpty) {
       setFormError('content is required');
       return;
     }
+
 
 
     const payload = {
@@ -157,8 +167,9 @@ const NewArticle = () => {
       // allow saving draft even if featured is checked
       featured: status === 'published' ? Boolean(featured) : false,
       featured_image: null,
-      summary: normalize(summary).trim() || '—',
-      content: normalize(content).trim() || '—',
+      summary: normalize(summary).trim(),
+      content: normalize(content).trim(),
+
     };
 
 
