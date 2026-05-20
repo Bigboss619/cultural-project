@@ -211,7 +211,7 @@ async function deleteExecutive(req, res) {
 
     // Delete the image file if it exists
     if (row.image_url) {
-      const imagePath = path.join(__dirname, '..', row.image_url);
+      const imagePath = path.resolve(__dirname, '..', row.image_url.replace(/^\//, ''));
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }
