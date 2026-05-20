@@ -21,6 +21,7 @@ const AdminHeader = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -83,6 +84,13 @@ const AdminHeader = () => {
   };
 
   const currentPage = getBreadcrumbs();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    setShowUserMenu(false);
+    navigate('/');
+  };
 
   return (
     <header
@@ -234,6 +242,7 @@ const AdminHeader = () => {
 
                 <div className={`border-t ${isDarkMode ? 'border-slate-600' : 'border-gray-200'} mt-2 pt-2`}>
                   <button
+                    onClick={handleLogout}
                     className={`w-full px-4 py-2 flex items-center gap-2 text-left text-sm transition-colors ${
                       isDarkMode
                         ? 'text-red-400 hover:bg-slate-600'
