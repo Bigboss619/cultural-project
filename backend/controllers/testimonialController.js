@@ -1,4 +1,6 @@
 const db = require('../config/config');
+const fs = require('fs');
+const path = require('path');
 
 // GET /api/testimonials - Get all testimonials (admin view)
 async function getAllTestimonials(req, res) {
@@ -186,6 +188,27 @@ async function deleteTestimonial(req, res) {
   try {
     const { id } = req.params;
 
+    // Fetch the testimonial first to get the image_url
+    const row = await new Promise((resolve, reject) => {
+      db.query('SELECT image_url FROM testimonials WHERE id = ? LIMIT 1', [id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results && results[0] ? results[0] : null);
+      });
+    });
+
+    if (!row) {
+      return res.status(404).json({ message: 'Testimonial not found' });
+    }
+
+    // Delete the image file if it exists
+    if (row.image_url) {
+      const imagePath = path.join(__dirname, '..', row.image_url);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    // Delete the testimonial record
     const result = await new Promise((resolve, reject) => {
       db.query('DELETE FROM testimonials WHERE id = ?', [id], (err, r) => {
         if (err) return reject(err);

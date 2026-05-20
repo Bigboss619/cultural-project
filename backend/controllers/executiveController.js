@@ -1,4 +1,6 @@
 const db = require('../config/config');
+const fs = require('fs');
+const path = require('path');
 
 // GET /api/executives - Get all executives (admin view)
 async function getAllExecutives(req, res) {
@@ -186,6 +188,27 @@ async function deleteExecutive(req, res) {
   try {
     const { id } = req.params;
 
+    // Fetch the executive first to get the image_url
+    const row = await new Promise((resolve, reject) => {
+      db.query('SELECT image_url FROM executives WHERE id = ? LIMIT 1', [id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results && results[0] ? results[0] : null);
+      });
+    });
+
+    if (!row) {
+      return res.status(404).json({ message: 'Executive not found' });
+    }
+
+    // Delete the image file if it exists
+    if (row.image_url) {
+      const imagePath = path.join(__dirname, '..', row.image_url);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
+    // Delete the executive record
     const result = await new Promise((resolve, reject) => {
       db.query('DELETE FROM executives WHERE id = ?', [id], (err, r) => {
         if (err) return reject(err);
