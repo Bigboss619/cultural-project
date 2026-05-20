@@ -21,6 +21,8 @@ const executivePublicRoutes = require('./routes/executivePublicRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const galleryPublicRoutes = require('./routes/galleryPublicRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const commentRoutes = require('./routes/commentRoutes');
+const commentPublicRoutes = require('./routes/commentPublicRoutes');
 
 const app = express();
 
@@ -49,6 +51,8 @@ app.use('/api/public/executives', executivePublicRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/public/gallery', galleryPublicRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/public/comments', commentPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 

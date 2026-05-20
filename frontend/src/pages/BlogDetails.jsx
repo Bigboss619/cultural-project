@@ -121,6 +121,129 @@ const AuthorBox = ({ author }) => (
   </div>
 );
 
+const CommentSection = ({ postId }) => {
+  const [comments, setComments] = useState([]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [content, setContent] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchComments = async () => {
+    try {
+      const resp = await axios.get(`/api/public/comments/${postId}`);
+      setComments(resp.data.comments || []);
+    } catch (err) {
+      console.error('Failed to fetch comments:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (postId) fetchComments();
+  }, [postId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    try {
+      await axios.post('/api/public/comments', {
+        post_id: postId,
+        author_name: name,
+        author_email: email,
+        content,
+      });
+      setSuccess(true);
+      setName('');
+      setEmail('');
+      setContent('');
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Failed to submit comment');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mt-12 p-6 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+      <h3 className="text-xl font-bold mb-6" style={{ color: COLORS.text }}>Comments</h3>
+
+      {/* Comment Form */}
+      <form onSubmit={handleSubmit} className="space-y-4 mb-8 pb-8 border-b border-gray-200 dark:border-slate-700">
+        <div className="grid md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2"
+            style={{ ringColor: COLORS.focus }}
+          />
+          <input
+            type="email"
+            placeholder="Your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2"
+            style={{ ringColor: COLORS.focus }}
+          />
+        </div>
+        <textarea
+          placeholder="Write your comment..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          required
+          rows={4}
+          className="w-full px-4 py-2 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 resize-none"
+          style={{ ringColor: COLORS.focus }}
+        />
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {success && <p className="text-green-500 text-sm">Comment submitted! It will appear after approval.</p>}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="px-6 py-2 text-white font-semibold rounded transition-colors duration-300 disabled:opacity-50"
+          style={{ backgroundColor: COLORS.primary }}
+          onMouseEnter={(e) => !submitting && (e.target.style.backgroundColor = COLORS.secondary)}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = COLORS.primary)}
+        >
+          {submitting ? 'Submitting...' : 'Submit Comment'}
+        </button>
+      </form>
+
+      {/* Comments List */}
+      <div className="space-y-6">
+        {comments.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400">No comments yet. Be the first to comment!</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="pb-4 border-b border-gray-100 dark:border-slate-700 last:border-0">
+              <div className="flex items-center gap-3 mb-2">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                  style={{ backgroundColor: COLORS.primary }}
+                >
+                  {comment.author_name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-semibold" style={{ color: COLORS.text }}>{comment.author_name}</p>
+                  <p className="text-xs text-gray-500">{new Date(comment.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 ml-13">{comment.content}</p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
 const SubscribeBox = () => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -286,6 +409,7 @@ const Details = () => {
                 content={post.content}
                 summary={post.summary}
               />
+              <CommentSection postId={post.id} />
             </div>
 
             {/* Sidebar */}
