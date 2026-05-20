@@ -35,7 +35,7 @@ const AdminVideos = lazy(() => import('./pages/AdminVideos.jsx'));
 const AdminComments = lazy(() => import('./pages/AdminComments.jsx'));
 const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminAnnouncements = lazy(() => import('./pages/AdminAnnouncements.jsx'));
-const AdminDonations = lazy(() => import('./pages/AdminDonations.jsx'));
+const AdminTestimonials = lazy(() => import('./pages/AdminTestimonial.jsx'));
 const AdminSettings = lazy(() => import('./pages/AdminSettings.jsx'));
 
 
@@ -70,7 +70,7 @@ const router = createBrowserRouter(
           { path: '/admin/comments', element: <AdminComments /> },
           { path: '/admin/messages', element: <AdminMessages /> },
           { path: '/admin/announcements', element: <AdminAnnouncements /> },
-          { path: '/admin/donations', element: <AdminDonations /> },
+          { path: '/admin/testimonials', element: <AdminTestimonials /> },
           { path: '/admin/settings', element: <AdminSettings /> }
       ],
     },

@@ -87,10 +87,10 @@ const AdminSidebar = () => {
       path: '/admin/announcements',
     },
     {
-      id: 'donations',
-      label: 'Donations',
+      id: 'testimonials',
+      label: 'Testimonials',
       icon: Heart,
-      path: '/admin/donations',
+      path: '/admin/testimonials',
     },
     {
       id: 'settings',
