@@ -9,6 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const categoryPublicRoutes = require('./routes/categoryPublicRoutes');
 const postRoutes = require('./routes/postRoutes');
 const postPublicRoutes = require('./routes/postPublicRoutes');
 const eventRoutes = require('./routes/eventRoutes');
@@ -17,6 +18,8 @@ const testimonialRoutes = require('./routes/testimonialRoutes');
 const testimonialPublicRoutes = require('./routes/testimonialPublicRoutes');
 const executiveRoutes = require('./routes/executiveRoutes');
 const executivePublicRoutes = require('./routes/executivePublicRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
+const galleryPublicRoutes = require('./routes/galleryPublicRoutes');
 
 const app = express();
 
@@ -33,6 +36,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/public/categories', categoryPublicRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/public/posts', postPublicRoutes);
 app.use('/api/events', eventRoutes);
@@ -41,6 +45,8 @@ app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/public/testimonials', testimonialPublicRoutes);
 app.use('/api/executives', executiveRoutes);
 app.use('/api/public/executives', executivePublicRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/public/gallery', galleryPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -12,6 +12,7 @@ function getSubDirectory(req) {
   if (baseUrl.includes('/executive')) return 'executive';
   if (baseUrl.includes('/post')) return 'blog';
   if (baseUrl.includes('/blog')) return 'blog';
+  if (baseUrl.includes('/gallery')) return 'gallery';
   return 'misc';
 }
 
