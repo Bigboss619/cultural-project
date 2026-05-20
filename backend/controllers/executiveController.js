@@ -147,8 +147,17 @@ async function updateExecutive(req, res) {
     let finalImageUrl = null;
     if (req.file) {
       finalImageUrl = `/uploads/executive/${req.file.filename}`;
-    } else if (req.body.image_url) {
-      finalImageUrl = String(req.body.image_url).trim();
+    } else {
+      // Fetch existing image from database to keep it
+      const existing = await new Promise((resolve, reject) => {
+        db.query('SELECT image_url FROM executives WHERE id = ? LIMIT 1', [id], (err, results) => {
+          if (err) return reject(err);
+          resolve(results && results[0] ? results[0] : null);
+        });
+      });
+      if (existing && existing.image_url) {
+        finalImageUrl = existing.image_url;
+      }
     }
     const finalBio = bio ? String(bio).trim() : null;
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
