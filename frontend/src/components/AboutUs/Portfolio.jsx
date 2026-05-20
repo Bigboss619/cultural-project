@@ -1,36 +1,66 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+
+const DEFAULT_EXECUTIVES = [
+  {
+    id: 'e1',
+    name: 'Legacy - Mogaji Abayomi Gbadamosi',
+    position: 'President',
+    image_url: '/images/portfolio/executive-1.jpg',
+    bio: null,
+  },
+  {
+    id: 'e2',
+    name: 'Legacy Alhaji Akeem Hussein',
+    position: 'Vice President',
+    image_url: '/images/portfolio/executive-2.jpg',
+    bio: null,
+  },
+  {
+    id: 'e3',
+    name: 'Legacy - Folarin Saheed',
+    position: 'General Secretary',
+    image_url: '/images/portfolio/executive-3.jpg',
+    bio: null,
+  },
+  {
+    id: 'e4',
+    name: 'Legacy - Adekunle Safiu',
+    position: 'Director of Finance',
+    image_url: '/images/portfolio/executive-4.jpg',
+    bio: null,
+  },
+  {
+    id: 'e5',
+    name: 'Legacy - Bukunmi Olugbade',
+    position: 'Director of Socials',
+    image_url: '/images/portfolio/executive-4.jpg',
+    bio: null,
+  },
+]
 
 const Portfolio = () => {
-  const executives = useMemo(
-    () => [
-      {
-        name: 'Legacy - Mogaji Abayomi Gbadamosi',
-        title: 'President',
-        imageSrc: '/images/portfolio/executive-1.jpg',
-      },
-      {
-        name: 'Legacy Alhaji Akeem Hussein',
-        title: 'Vice President',
-        imageSrc: '/images/portfolio/executive-2.jpg',
-      },
-      {
-        name: 'Legacy - Folarin Saheed',
-        title: 'General Secretary',
-        imageSrc: '/images/portfolio/executive-3.jpg',
-      },
-      {
-        name: 'Legacy - Adekunle Safiu',
-        title: 'Director of Finance',
-        imageSrc: '/images/portfolio/executive-4.jpg',
-      },
-      {
-        name: 'Legacy - Bukunmi Olugbade',
-        title: 'Director of Socials',
-        imageSrc: '/images/portfolio/executive-4.jpg',
+  const [executives, setExecutives] = useState(DEFAULT_EXECUTIVES)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchExecutives = async () => {
+      try {
+        const resp = await fetch('/api/public/executives')
+        if (resp.ok) {
+          const data = await resp.json()
+          if (data.executives && data.executives.length > 0) {
+            setExecutives(data.executives)
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch executives, using defaults')
+      } finally {
+        setLoading(false)
       }
-    ],
-    []
-  )
+    }
+
+    fetchExecutives()
+  }, [])
 
   const itemsRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -85,19 +115,13 @@ const Portfolio = () => {
 
     let lastInvokedAt = 0
     const id = setInterval(() => {
-      // Prevent rapid re-triggering while the user is interacting.
       const now = Date.now()
       if (now - lastInvokedAt < 300) return
-
-      const isUserScrolling = el.matches(':hover') === false && el.scrollLeft !== 0
-      // (We keep it simple; main goal is preventing page scroll.)
 
       lastInvokedAt = now
 
       setActiveIndex((prev) => {
         const next = prev + 1 >= executives.length ? 0 : prev + 1
-        // Avoid scrollIntoView which may affect the page position.
-        // Instead, scroll the carousel container only.
         const child = el.children[next]
         if (child) {
           el.scrollTo({ left: child.offsetLeft, behavior: 'smooth' })
@@ -108,6 +132,29 @@ const Portfolio = () => {
 
     return () => clearInterval(id)
   }, [executives.length])
+
+  if (loading) {
+    return (
+      <section className='py-20 md:py-32 bg-white'>
+        <div className='container mx-auto px-4 md:px-8'>
+          <div className='text-center mb-12 md:mb-16'>
+            <span className='text-[#D4A574] font-accent text-lg font-semibold'>
+              Our Executives
+            </span>
+            <h2 className='font-display text-4xl md:text-5xl font-bold text-[#1A1A1A] mt-2 mb-4'>
+              Leadership at a Glance
+            </h2>
+            <p className='font-body text-lg text-gray-600 max-w-2xl mx-auto'>
+              Meet the team guiding our mission with integrity, excellence, and cultural pride.
+            </p>
+          </div>
+          <div className='flex justify-center items-center h-64'>
+            <div className='w-10 h-10 border-4 border-[#D4A574] border-t-transparent rounded-full animate-spin'></div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className='py-20 md:py-32 bg-white'>
@@ -174,7 +221,7 @@ const Portfolio = () => {
           >
             {executives.map((exec) => (
               <div
-                key={exec.name}
+                key={exec.id}
                 className='snap-start shrink-0 w-[85vw] sm:w-[70vw] md:w-[32%]'
               >
                 <div className='card-heritage h-full rounded-lg'>
@@ -183,13 +230,12 @@ const Portfolio = () => {
                     <div className='absolute -bottom-10 -left-10 w-28 h-28 bg-[#B85C3C] opacity-10 blur-2xl rounded-full' />
 
                     <img
-                      src={exec.imageSrc}
+                      src={exec.image_url || '/images/cultural-heritage.jpg'}
                       alt={exec.name}
                       className='w-full aspect-square object-cover rounded-lg border border-gray-100'
 
                       loading='lazy'
                       onError={(e) => {
-                        // Keep layout intact even if placeholder image isn't present.
                         e.currentTarget.src = '/images/cultural-heritage.jpg'
                       }}
                     />
@@ -198,7 +244,7 @@ const Portfolio = () => {
                   <div className='mt-6'>
                     <div className='inline-flex items-center gap-2 mb-3'>
                       <span className='w-2.5 h-2.5 rounded-full bg-[#B85C3C]' />
-                      <p className='font-body text-sm text-gray-600'>{exec.title}</p>
+                      <p className='font-body text-sm text-gray-600'>{exec.position}</p>
                     </div>
                     <h3 className='font-display text-2xl font-bold text-[#1A1A1A]'>{exec.name}</h3>
                   </div>
@@ -212,7 +258,7 @@ const Portfolio = () => {
               const isActive = idx === activeIndex
               return (
                 <button
-                  key={exec.name}
+                  key={exec.id}
                   type='button'
                   aria-label={`Go to executive ${idx + 1}`}
                   onClick={() => scrollToIndex(idx)}

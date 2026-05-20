@@ -63,10 +63,10 @@ const AdminSidebar = () => {
       path: '/admin/gallery',
     },
     {
-      id: 'videos',
-      label: 'Videos',
+      id: 'executive',
+      label: 'Executive',
       icon: Video,
-      path: '/admin/videos',
+      path: '/admin/executive',
     },
     {
       id: 'comments',

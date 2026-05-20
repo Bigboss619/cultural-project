@@ -87,7 +87,6 @@ async function createTestimonial(req, res) {
       quote,
       name,
       title,
-      image_url,
       status = 'draft',
       display_order = 0,
     } = req.body || {};
@@ -99,7 +98,8 @@ async function createTestimonial(req, res) {
     if (!finalName) return res.status(400).json({ message: 'name is required' });
 
     const finalTitle = String(title || '').trim();
-    const finalImageUrl = image_url ? String(image_url).trim() : null;
+    // Handle file upload - multer puts info in req.file
+    const finalImageUrl = req.file ? `/uploads/testimonial/${req.file.filename}` : null;
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
     const finalOrder = Number(display_order) || 0;
 
@@ -131,7 +131,6 @@ async function updateTestimonial(req, res) {
       quote,
       name,
       title,
-      image_url,
       status = 'draft',
       display_order = 0,
     } = req.body || {};
@@ -143,7 +142,13 @@ async function updateTestimonial(req, res) {
     if (!finalName) return res.status(400).json({ message: 'name is required' });
 
     const finalTitle = String(title || '').trim();
-    const finalImageUrl = image_url ? String(image_url).trim() : null;
+    // Handle file upload - if new image uploaded, use it; otherwise keep existing
+    let finalImageUrl = null;
+    if (req.file) {
+      finalImageUrl = `/uploads/testimonial/${req.file.filename}`;
+    } else if (req.body.image_url) {
+      finalImageUrl = String(req.body.image_url).trim();
+    }
     const finalStatus = ['draft', 'published'].includes(status) ? status : 'draft';
     const finalOrder = Number(display_order) || 0;
 
