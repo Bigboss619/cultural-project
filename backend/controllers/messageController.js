@@ -1,4 +1,25 @@
 const db = require('../config/config');
+const nodemailer = require('nodemailer');
+const { replyEmailTemplate } = require('../utils/emailTemplates');
+
+// Reuse or create transporter
+let transporter = null;
+function getTransporter() {
+  if (transporter) return transporter;
+
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  if (!emailUser || !emailPass) return null;
+
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: emailUser,
+      pass: emailPass,
+    },
+  });
+  return transporter;
+}
 
 // GET /api/messages - Get all messages (admin view)
 async function getAllMessages(req, res) {
@@ -42,6 +63,35 @@ async function getAllMessages(req, res) {
       );
     });
 
+    // Get reply count for each message
+    if (rows.length > 0) {
+      const ids = rows.map(r => r.id);
+      const placeholders = ids.map(() => '?').join(',');
+
+      const replyCounts = await new Promise((resolve, reject) => {
+        db.query(
+          `SELECT message_id, COUNT(*) as reply_count
+           FROM message_replies
+           WHERE message_id IN (${placeholders})
+           GROUP BY message_id`,
+          ids,
+          (err, results) => {
+            if (err) return reject(err);
+            resolve(results || []);
+          }
+        );
+      });
+
+      const countMap = {};
+      replyCounts.forEach(rc => {
+        countMap[rc.message_id] = rc.reply_count;
+      });
+
+      rows.forEach(row => {
+        row.reply_count = countMap[row.id] || 0;
+      });
+    }
+
     return res.json({ messages: rows });
   } catch (err) {
     return res.status(500).json({ message: 'Failed to fetch messages', error: err.message });
@@ -78,7 +128,22 @@ async function getMessageById(req, res) {
 
     if (!row) return res.status(404).json({ message: 'Message not found' });
 
-    return res.json({ message: row });
+    // Get replies for this message
+    const replies = await new Promise((resolve, reject) => {
+      db.query(
+        `SELECT id, replied_by, reply_text, created_at
+         FROM message_replies
+         WHERE message_id = ?
+         ORDER BY created_at ASC`,
+        [id],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results || []);
+        }
+      );
+    });
+
+    return res.json({ message: row, replies });
   } catch (err) {
     return res.status(500).json({ message: 'Failed to fetch message', error: err.message });
   }
@@ -222,6 +287,129 @@ async function markMessageRead(req, res) {
   }
 }
 
+// POST /api/messages/:id/reply - Add reply to message (stores in database)
+async function addReply(req, res) {
+  try {
+    const { id } = req.params;
+    const { reply_text } = req.body || {};
+
+    const finalReplyText = String(reply_text || '').trim();
+    if (!finalReplyText) {
+      return res.status(400).json({ message: 'reply_text is required' });
+    }
+
+    // Verify message exists
+    const messageRow = await new Promise((resolve, reject) => {
+      db.query('SELECT id, email, subject FROM messages WHERE id = ? LIMIT 1', [id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results && results[0] ? results[0] : null);
+      });
+    });
+
+    if (!messageRow) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    // Insert the reply
+    const result = await new Promise((resolve, reject) => {
+      db.query(
+        `INSERT INTO message_replies (message_id, replied_by, reply_text, created_at)
+         VALUES (?, 'admin', ?, NOW())`,
+        [id, finalReplyText],
+        (err, r) => {
+          if (err) return reject(err);
+          resolve(r);
+        }
+      );
+    });
+
+    // Update message status to 'open' when a new reply is added
+    await new Promise((resolve, reject) => {
+      db.query(
+        'UPDATE messages SET status = \'open\', updated_at = NOW() WHERE id = ?',
+        [id],
+        (err, r) => {
+          if (err) return reject(err);
+          resolve(r);
+        }
+      );
+    });
+
+    // Fetch the full message to include in email
+    const fullMessage = await new Promise((resolve, reject) => {
+      db.query(
+        'SELECT full_name, message FROM messages WHERE id = ? LIMIT 1',
+        [id],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results && results[0] ? results[0] : { full_name: 'Visitor', message: '' });
+        }
+      );
+    });
+
+    // Send reply email to the user
+    const tp = getTransporter();
+    if (tp) {
+      try {
+        const emailData = replyEmailTemplate({
+          userName: fullMessage.full_name,
+          originalSubject: messageRow.subject,
+          originalMessage: fullMessage.message,
+          adminReply: finalReplyText,
+          senderName: process.env.FROM_NAME || 'Cultural Project',
+        });
+
+        await tp.sendMail({
+          from: `"${process.env.FROM_NAME || 'Cultural Project'}" <${process.env.EMAIL_USER}>`,
+          to: messageRow.email,
+          subject: emailData.subject,
+          html: emailData.html,
+          text: emailData.text,
+        });
+      } catch (emailErr) {
+        console.error('Failed to send reply email:', emailErr.message);
+        // Don't fail the request if email fails - reply is still saved
+      }
+    } else {
+      console.warn('Email not sent: SMTP not configured');
+    }
+
+    return res.status(201).json({
+      message: 'Reply added successfully',
+      replyId: result.insertId,
+      recipientEmail: messageRow.email,
+      recipientSubject: messageRow.subject,
+    });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to add reply', error: err.message });
+  }
+}
+
+// GET /api/messages/:id/replies - Get all replies for a message
+async function getReplies(req, res) {
+  try {
+    const { id } = req.params;
+
+    const replies = await new Promise((resolve, reject) => {
+      db.query(
+        `SELECT id, replied_by, reply_text, created_at
+         FROM message_replies
+         WHERE message_id = ?
+         ORDER BY created_at ASC`,
+        [id],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results || []);
+        }
+      );
+    });
+
+    return res.json({ replies });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch replies', error: err.message });
+  }
+}
+
 module.exports = {
   getAllMessages,
   getMessageById,
@@ -229,4 +417,6 @@ module.exports = {
   updateMessage,
   deleteMessage,
   markMessageRead,
+  addReply,
+  getReplies,
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import { RefreshCw, Trash2, Mail, MailOpen, Search } from 'lucide-react';
+import { RefreshCw, Trash2, Mail, MailOpen, Search, Send, MessageSquare } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '../components/toast';
 
@@ -11,6 +11,9 @@ const AdminMessages = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [replies, setReplies] = useState([]);
+  const [replyText, setReplyText] = useState('');
+  const [sendingReply, setSendingReply] = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [deletingId, setDeletingId] = useState(null);
@@ -46,6 +49,28 @@ const AdminMessages = () => {
     fetchMessages();
   }, [fetchMessages]);
 
+  // Fetch replies when a message is selected
+  const fetchReplies = useCallback(async (messageId) => {
+    try {
+      const resp = await axios.get(`/api/messages/${messageId}/replies`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      setReplies(resp.data?.replies || []);
+    } catch (err) {
+      console.warn('Failed to fetch replies', err);
+      setReplies([]);
+    }
+  }, [authToken]);
+
+  const handleSelectMessage = (msg) => {
+    setSelectedMessage(msg);
+    setReplyText('');
+    if (!msg.is_read) {
+      handleMarkRead(msg.id);
+    }
+    fetchReplies(msg.id);
+  };
+
   const handleMarkRead = async (id) => {
     try {
       await axios.patch(`/api/messages/${id}/read`, {}, {
@@ -77,6 +102,27 @@ const AdminMessages = () => {
     }
   };
 
+  const handleSendReply = async () => {
+    if (!replyText.trim() || !selectedMessage) return;
+
+    try {
+      setSendingReply(true);
+      const resp = await axios.post(`/api/messages/${selectedMessage.id}/reply`, {
+        reply_text: replyText.trim(),
+      }, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      showSuccess('Reply sent successfully');
+      setReplyText('');
+      fetchReplies(selectedMessage.id);
+    } catch (err) {
+      showError('Failed to send reply');
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this message?')) return;
 
@@ -89,6 +135,7 @@ const AdminMessages = () => {
       setMessages(prev => prev.filter(m => m.id !== id));
       if (selectedMessage && selectedMessage.id === id) {
         setSelectedMessage(null);
+        setReplies([]);
       }
       showSuccess('Message deleted successfully');
     } catch (err) {
@@ -215,132 +262,175 @@ const AdminMessages = () => {
             </select>
           </div>
 
-          {/* Messages List */}
-          <div className="divide-y divide-gray-200 dark:divide-slate-700">
-            {loading ? (
-              <div className="p-8 text-center">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              </div>
-            ) : error ? (
-              <div className="p-8 text-center text-red-600">
-                <p className="mb-3">{error}</p>
-                <button
-                  onClick={fetchMessages}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : filteredMessages.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                No messages found
-              </div>
-            ) : (
-              filteredMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  onClick={() => {
-                    setSelectedMessage(msg);
-                    if (!msg.is_read) handleMarkRead(msg.id);
-                  }}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${
-                    selectedMessage?.id === msg.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                  } ${!msg.is_read ? 'font-semibold' : ''}`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`p-2 rounded-full ${msg.is_read ? 'bg-gray-100 dark:bg-slate-700' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
-                      {msg.is_read ? (
-                        <MailOpen size={20} className="text-gray-400" />
-                      ) : (
-                        <Mail size={20} className="text-blue-600" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900 dark:text-white">
+          {/* Two column layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 dark:divide-slate-700">
+            {/* Messages List */}
+            <div className="max-h-[600px] overflow-y-auto">
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                </div>
+              ) : error ? (
+                <div className="p-8 text-center text-red-600">
+                  <p className="mb-3">{error}</p>
+                  <button
+                    onClick={fetchMessages}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : filteredMessages.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  No messages found
+                </div>
+              ) : (
+                filteredMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    onClick={() => handleSelectMessage(msg)}
+                    className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${
+                      selectedMessage?.id === msg.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                    } ${!msg.is_read ? 'font-semibold' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-full flex-shrink-0 ${msg.is_read ? 'bg-gray-100 dark:bg-slate-700' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
+                        {msg.is_read ? (
+                          <MailOpen size={18} className="text-gray-400" />
+                        ) : (
+                          <Mail size={18} className="text-blue-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-900 dark:text-white text-sm">
                             {msg.full_name}
                           </span>
-                          {!msg.is_read && (
-                            <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                          )}
+                          <span className="text-xs text-gray-500">
+                            {formatDate(msg.created_at)}
+                          </span>
                         </div>
-                        <span className="text-sm text-gray-500">
-                          {formatDate(msg.created_at)}
-                        </span>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                          {msg.subject}
+                        </p>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                        {msg.subject}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {msg.email}
-                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        msg.status === 'open'
-                          ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                          : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                      }`}>
-                        {msg.status}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Message Details + Replies */}
+            <div className="max-h-[600px] overflow-y-auto">
+              {selectedMessage ? (
+                <div className="p-4 space-y-4">
+                  {/* Message header */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-gray-900 dark:text-white">Message</h3>
+                    <select
+                      value={selectedMessage.status}
+                      onChange={(e) => handleStatusChange(selectedMessage.id, e.target.value)}
+                      className="px-2 py-1 rounded border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-xs"
+                    >
+                      <option value="open">Open</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                  </div>
+
+                  {/* Original message */}
+                  <div className="p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-sm">{selectedMessage.full_name}</span>
+                      <span className="text-xs text-gray-500">{selectedMessage.email}</span>
+                    </div>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">{selectedMessage.subject}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{selectedMessage.message}</p>
+                    <p className="text-xs text-gray-400 mt-2">{formatDate(selectedMessage.created_at)}</p>
+                  </div>
+
+                  {/* Replies section */}
+                  {replies.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <MessageSquare size={16} />
+                        <span>Replies ({replies.length})</span>
+                      </div>
+                      {replies.map((reply) => (
+                        <div
+                          key={reply.id}
+                          className={`p-3 rounded-lg ${
+                            reply.replied_by === 'admin'
+                              ? 'bg-blue-50 dark:bg-blue-900/20 ml-4'
+                              : 'bg-gray-50 dark:bg-slate-900 mr-4'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-xs font-medium ${
+                              reply.replied_by === 'admin'
+                                ? 'text-blue-600'
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}>
+                              {reply.replied_by === 'admin' ? 'You (Admin)' : selectedMessage.full_name}
+                            </span>
+                            <span className="text-xs text-gray-400">{formatDate(reply.created_at)}</span>
+                          </div>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{reply.reply_text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Reply input */}
+                  <div className="pt-2 border-t border-gray-200 dark:border-slate-700">
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder="Type your reply..."
+                      rows={3}
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                    />
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-xs text-gray-500">
+                        Reply will be saved in database
                       </span>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(msg.id);
-                        }}
-                        disabled={deletingId === msg.id}
-                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50"
+                        onClick={handleSendReply}
+                        disabled={!replyText.trim() || sendingReply}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 text-sm disabled:opacity-50 transition-colors"
                       >
-                        <Trash2 size={16} />
+                        {sendingReply ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <Send size={16} />
+                            Send Reply
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
 
-          {/* Message Details Panel */}
-          {selectedMessage && (
-            <div className="border-t border-gray-200 dark:border-slate-700 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold">Message Details</h3>
-                <select
-                  value={selectedMessage.status}
-                  onChange={(e) => handleStatusChange(selectedMessage.id, e.target.value)}
-                  className="px-3 py-1 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-sm"
-                >
-                  <option value="open">Open</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </div>
-
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">From</p>
-                    <p className="font-medium">{selectedMessage.full_name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedMessage.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Received</p>
-                    <p className="font-medium">{formatDate(selectedMessage.created_at)}</p>
-                  </div>
+                  {/* Delete button */}
+                  <button
+                    onClick={() => handleDelete(selectedMessage.id)}
+                    disabled={deletingId === selectedMessage.id}
+                    className="w-full mt-2 px-4 py-2 border border-red-200 dark:border-red-800 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg flex items-center justify-center gap-2 text-sm disabled:opacity-50 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                    Delete Message
+                  </button>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Subject</p>
-                  <p className="font-medium">{selectedMessage.subject}</p>
+              ) : (
+                <div className="p-8 flex flex-col items-center justify-center h-full text-gray-500">
+                  <Mail size={48} className="mb-4 opacity-20" />
+                  <p>Select a message to view details</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Message</p>
-                  <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-lg">
-                    <p className="whitespace-pre-wrap">{selectedMessage.message}</p>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </AdminLayout>
