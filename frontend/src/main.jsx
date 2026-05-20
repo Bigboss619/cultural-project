@@ -37,6 +37,7 @@ const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminAnnouncements = lazy(() => import('./pages/AdminAnnouncements.jsx'));
 const AdminTestimonials = lazy(() => import('./pages/AdminTestimonial.jsx'));
 const AdminSettings = lazy(() => import('./pages/AdminSettings.jsx'));
+const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage.jsx'));
 
 
 const router = createBrowserRouter(
@@ -71,7 +72,8 @@ const router = createBrowserRouter(
           { path: '/admin/messages', element: <AdminMessages /> },
           { path: '/admin/announcements', element: <AdminAnnouncements /> },
           { path: '/admin/testimonials', element: <AdminTestimonials /> },
-          { path: '/admin/settings', element: <AdminSettings /> }
+          { path: '/admin/settings', element: <AdminSettings /> },
+          { path: '/admin/profile', element: <AdminProfilePage /> }
       ],
     },
   ],

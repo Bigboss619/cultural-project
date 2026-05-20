@@ -102,7 +102,7 @@ async function getProfile(req, res) {
     if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const rows = await new Promise((resolve, reject) => {
-      db.query('SELECT id, name, email, role FROM users WHERE id = ?', [userId], (err, r) => {
+      db.query('SELECT id, name, email, role, phone, bio, created_at FROM users WHERE id = ?', [userId], (err, r) => {
         if (err) return reject(err);
         resolve(r);
       });
@@ -116,5 +116,109 @@ async function getProfile(req, res) {
   }
 }
 
-module.exports = { register, login, getProfile };
+// PUT /api/auth/profile
+async function updateProfile(req, res) {
+  try {
+    const { userId } = req.user || {};
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { name, phone, bio } = req.body || {};
+
+    const updates = [];
+    const params = [];
+
+    if (name !== undefined) {
+      updates.push('name = ?');
+      params.push(name || null);
+    }
+
+    if (phone !== undefined) {
+      updates.push('phone = ?');
+      params.push(phone || null);
+    }
+
+    if (bio !== undefined) {
+      updates.push('bio = ?');
+      params.push(bio || null);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    params.push(userId);
+
+    await new Promise((resolve, reject) => {
+      db.query(
+        `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+        params,
+        (err, r) => {
+          if (err) return reject(err);
+          resolve(r);
+        }
+      );
+    });
+
+    // Fetch updated user
+    const rows = await new Promise((resolve, reject) => {
+      db.query('SELECT id, name, email, role, phone, bio, created_at FROM users WHERE id = ?', [userId], (err, r) => {
+        if (err) return reject(err);
+        resolve(r);
+      });
+    });
+
+    return res.json({ message: 'Profile updated successfully', user: rows[0] });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to update profile', error: err.message });
+  }
+}
+
+// PUT /api/auth/change-password
+async function changePassword(req, res) {
+  try {
+    const { userId } = req.user || {};
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'currentPassword and newPassword are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+
+    // Get current password hash
+    const rows = await new Promise((resolve, reject) => {
+      db.query('SELECT password FROM users WHERE id = ?', [userId], (err, r) => {
+        if (err) return reject(err);
+        resolve(r);
+      });
+    });
+
+    if (rows.length === 0) return res.status(404).json({ message: 'User not found' });
+
+    const user = rows[0];
+    const ok = await bcrypt.compare(currentPassword, user.password);
+    if (!ok) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+
+    await new Promise((resolve, reject) => {
+      db.query('UPDATE users SET password = ? WHERE id = ?', [newHash, userId], (err, r) => {
+        if (err) return reject(err);
+        resolve(r);
+      });
+    });
+
+    return res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to change password', error: err.message });
+  }
+}
+
+module.exports = { register, login, getProfile, updateProfile, changePassword };
 

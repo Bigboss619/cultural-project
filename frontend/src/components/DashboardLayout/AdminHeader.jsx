@@ -13,7 +13,7 @@ import {
   User,
   ChevronDown,
 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 const AdminHeader = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -209,7 +209,8 @@ const AdminHeader = () => {
                 </div>
 
 
-                <button
+                <Link
+                  to="/admin/profile"
                   className={`w-full px-4 py-2 flex items-center gap-2 text-left text-sm transition-colors ${
                     isDarkMode
                       ? 'text-slate-300 hover:bg-slate-600'
@@ -217,8 +218,8 @@ const AdminHeader = () => {
                   }`}
                 >
                   <User size={16} />
-                  Profile
-                </button>
+                  My Profile
+                </Link>
 
                 <button
                   className={`w-full px-4 py-2 flex items-center gap-2 text-left text-sm transition-colors ${
