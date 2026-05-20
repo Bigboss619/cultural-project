@@ -20,6 +20,7 @@ const executiveRoutes = require('./routes/executiveRoutes');
 const executivePublicRoutes = require('./routes/executivePublicRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const galleryPublicRoutes = require('./routes/galleryPublicRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use('/api/executives', executiveRoutes);
 app.use('/api/public/executives', executivePublicRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/public/gallery', galleryPublicRoutes);
+app.use('/api/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5000;
 
