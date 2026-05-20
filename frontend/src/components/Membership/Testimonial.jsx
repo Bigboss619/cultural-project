@@ -1,51 +1,58 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-const TESTIMONIALS = [
+const DEFAULT_TESTIMONIALS = [
   {
     id: 't1',
-    quote:
-      'Legacy Stars of Ibadan turned our heritage into a living experience. The energy, respect, and teamwork were unmatched.',
+    quote: 'Legacy Stars of Ibadan turned our heritage into a living experience. The energy, respect, and teamwork were unmatched.',
     name: 'Zainab O.',
     title: 'Member, Community Partner',
-    image: { label: 'ZO', gradientFrom: '#B85C3C', gradientTo: '#1A1A1A' },
+    image_url: null,
   },
   {
     id: 't2',
-    quote:
-      'Their programs made culture feel personal—storytelling, workshops, and performances that truly honor Ibadan’s roots.',
+    quote: 'Their programs made culture feel personal—storytelling, workshops, and performances that truly honor Ibadan\'s roots.',
     name: 'Samuel K.',
     title: 'Volunteer & Supporter',
-    image: { label: 'SK', gradientFrom: '#D4A574', gradientTo: '#B85C3C' },
+    image_url: null,
   },
   {
     id: 't3',
-    quote:
-      'From planning to execution, Legacy Stars consistently delivered with heart. It’s more than an organization—it’s a family.',
+    quote: 'From planning to execution, Legacy Stars consistently delivered with heart. It\'s more than an organization—it\'s a family.',
     name: 'Folake T.',
     title: 'Participant',
-    image: { label: 'FT', gradientFrom: '#1A1A1A', gradientTo: '#B85C3C' },
-  },
-  {
-    id: 't4',
-    quote:
-      'I’ve never seen such strong collaboration around tradition and youth growth. It’s inspiring and practical.',
-    name: 'Oluwaseun R.',
-    title: 'Mentor',
-    image: { label: 'OR', gradientFrom: '#8B4423', gradientTo: '#D4A574' },
+    image_url: null,
   },
 ]
 
+function TestimonialAvatar({ testimonial }) {
+  if (testimonial.image_url) {
+    return (
+      <img
+        src={testimonial.image_url}
+        alt={testimonial.name}
+        className="w-14 h-14 rounded-2xl object-cover shadow-sm"
+      />
+    )
+  }
 
-function TestimonialAvatar({ image }) {
+  const colors = [
+    { from: '#B85C3C', to: '#1A1A1A' },
+    { from: '#D4A574', to: '#B85C3C' },
+    { from: '#1A1A1A', to: '#B85C3C' },
+    { from: '#8B4423', to: '#D4A574' },
+  ]
+  const colorIndex = testimonial.name.charCodeAt(0) % colors.length
+  const { from, to } = colors[colorIndex]
+
   return (
     <div
       className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm"
       style={{
-        backgroundImage: `linear-gradient(135deg, ${image.gradientFrom}, ${image.gradientTo})`,
+        backgroundImage: `linear-gradient(135deg, ${from}, ${to})`,
       }}
       aria-hidden="true"
     >
-      <div className="text-white text-lg font-display font-bold">{image.label}</div>
+      <div className="text-white text-lg font-display font-bold">{testimonial.name.charAt(0).toUpperCase()}</div>
     </div>
   )
 }
@@ -67,23 +74,24 @@ function TestimonialCarousel({ items }) {
     return () => clearInterval(t)
   }, [items])
 
+  if (!items || items.length === 0) return null
+
   const active = items[index]
 
   return (
     <div className="relative">
       <article className="rounded-2xl border border-[#E0D5C7] bg-white/80 shadow-sm p-6 md:p-8">
         <div className="flex items-start gap-4">
-          {/* picture */}
-          <TestimonialAvatar image={active.image} />
+          <TestimonialAvatar testimonial={active} />
 
           <div className="flex-1">
             <p className="font-body text-[#1A1A1A] text-lg leading-relaxed">
-              “{active.quote}”
+              "{active.quote}"
             </p>
 
             <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-2">
               <p className="font-display font-bold text-[#B85C3C]">{active.name}</p>
-              <span className="text-gray-600">• {active.title}</span>
+              {active.title && <span className="text-gray-600">• {active.title}</span>}
             </div>
           </div>
         </div>
@@ -135,23 +143,42 @@ function TestimonialCarousel({ items }) {
 }
 
 const Testimonial = () => {
-    const testimonials = useMemo(() => TESTIMONIALS, [])
-  return (
-    <>
-          {/* Testimonials */}
-      <section className="bg-[#F0EBE3] border-t border-[#E0D5C7] py-12 md:py-16">
-        <div className="container mx-auto px-4 md:px-8 max-w-6xl">
-          <div className="mb-10">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1A1A1A]">Testimonials</h2>
-            <p className="font-body text-gray-700 mt-3 max-w-2xl">
-              What people are saying about <span className="text-[#B85C3C] font-semibold">Legacy Stars</span>.
-            </p>
-          </div>
+  const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS)
+  const [loading, setLoading] = useState(true)
 
-          <TestimonialCarousel items={testimonials} />
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const resp = await fetch('/api/public/testimonials')
+        if (resp.ok) {
+          const data = await resp.json()
+          if (data.testimonials && data.testimonials.length > 0) {
+            setTestimonials(data.testimonials)
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch testimonials, using defaults')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTestimonials()
+  }, [])
+
+  return (
+    <section className="bg-[#F0EBE3] border-t border-[#E0D5C7] py-12 md:py-16">
+      <div className="container mx-auto px-4 md:px-8 max-w-6xl">
+        <div className="mb-10">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1A1A1A]">Testimonials</h2>
+          <p className="font-body text-gray-700 mt-3 max-w-2xl">
+            What people are saying about <span className="text-[#B85C3C] font-semibold">Legacy Stars</span>.
+          </p>
         </div>
-      </section>
-    </>
+
+        {!loading && <TestimonialCarousel items={testimonials} />}
+      </div>
+    </section>
   )
 }
 

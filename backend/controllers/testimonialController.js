@@ -198,10 +198,40 @@ async function deleteTestimonial(req, res) {
   }
 }
 
+// GET /api/public/testimonials - Get all published testimonials (public view)
+async function getAllPublishedTestimonials(req, res) {
+  try {
+    const rows = await new Promise((resolve, reject) => {
+      db.query(
+        `SELECT
+          t.id,
+          t.quote,
+          t.name,
+          t.title,
+          t.image_url,
+          t.display_order
+        FROM testimonials t
+        WHERE t.status = 'published'
+        ORDER BY COALESCE(t.display_order, 9999) ASC, t.created_at DESC`,
+        [],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results || []);
+        }
+      );
+    });
+
+    return res.json({ testimonials: rows });
+  } catch (err) {
+    return res.status(500).json({ message: 'Failed to fetch testimonials', error: err.message });
+  }
+}
+
 module.exports = {
   getAllTestimonials,
   getTestimonialById,
   createTestimonial,
   updateTestimonial,
   deleteTestimonial,
+  getAllPublishedTestimonials,
 };

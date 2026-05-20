@@ -12,6 +12,8 @@ const postRoutes = require('./routes/postRoutes');
 const postPublicRoutes = require('./routes/postPublicRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const eventPublicRoutes = require('./routes/eventPublicRoutes');
+const testimonialRoutes = require('./routes/testimonialRoutes');
+const testimonialPublicRoutes = require('./routes/testimonialPublicRoutes');
 
 const app = express();
 
@@ -29,6 +31,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/public/posts', postPublicRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/public/events', eventPublicRoutes);
+app.use('/api/testimonials', testimonialRoutes);
+app.use('/api/public/testimonials', testimonialPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 
