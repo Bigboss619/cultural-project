@@ -5,6 +5,7 @@ import ErrorBoundary from './components/Errorhandle/ErrorBoundary';
 import './index.css'
 
 import App from './App.jsx'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 // Admin New Article (Tiptap page)
 const NewArticlePage = lazy(() => import('./pages/NewArticle.jsx'));
@@ -57,23 +58,22 @@ const router = createBrowserRouter(
         { path: '/membership', element: <Membership />},
         { path: '/pricing', element: <Pricing />},
         { path: '/login', element: <Login /> },
-          // Admin Routes
-          { path: '/admin', element: <AdminDashboard /> },
-          { path: '/admin/users', element: <AdminUsers /> },
-          { path: '/admin/categories', element: <AdminCategories /> },
-          { path: '/admin/posts', element: <AdminPosts /> },
-          { path: '/admin/posts/new', element: <NewArticlePage /> },
-          { path: '/admin/posts/:mode/:id', element: <NewArticlePage /> },
-
-          { path: '/admin/events', element: <AdminEvents /> },
-          { path: '/admin/gallery', element: <AdminGallery /> },
-          { path: '/admin/executive', element: <AdminExecutive /> },
-          { path: '/admin/comments', element: <AdminComments /> },
-          { path: '/admin/messages', element: <AdminMessages /> },
-          { path: '/admin/announcements', element: <AdminAnnouncements /> },
-          { path: '/admin/testimonials', element: <AdminTestimonials /> },
-          { path: '/admin/settings', element: <AdminSettings /> },
-          { path: '/admin/profile', element: <AdminProfilePage /> }
+          // Admin Routes (protected)
+          { path: '/admin', element: <ProtectedRoute><AdminDashboard /></ProtectedRoute> },
+          { path: '/admin/users', element: <ProtectedRoute><AdminUsers /></ProtectedRoute> },
+          { path: '/admin/categories', element: <ProtectedRoute><AdminCategories /></ProtectedRoute> },
+          { path: '/admin/posts', element: <ProtectedRoute><AdminPosts /></ProtectedRoute> },
+          { path: '/admin/posts/new', element: <ProtectedRoute><NewArticlePage /></ProtectedRoute> },
+          { path: '/admin/posts/:mode/:id', element: <ProtectedRoute><NewArticlePage /></ProtectedRoute> },
+          { path: '/admin/events', element: <ProtectedRoute><AdminEvents /></ProtectedRoute> },
+          { path: '/admin/gallery', element: <ProtectedRoute><AdminGallery /></ProtectedRoute> },
+          { path: '/admin/executive', element: <ProtectedRoute><AdminExecutive /></ProtectedRoute> },
+          { path: '/admin/comments', element: <ProtectedRoute><AdminComments /></ProtectedRoute> },
+          { path: '/admin/messages', element: <ProtectedRoute><AdminMessages /></ProtectedRoute> },
+          { path: '/admin/announcements', element: <ProtectedRoute><AdminAnnouncements /></ProtectedRoute> },
+          { path: '/admin/testimonials', element: <ProtectedRoute><AdminTestimonials /></ProtectedRoute> },
+          { path: '/admin/settings', element: <ProtectedRoute><AdminSettings /></ProtectedRoute> },
+          { path: '/admin/profile', element: <ProtectedRoute><AdminProfilePage /></ProtectedRoute> }
       ],
     },
   ],
