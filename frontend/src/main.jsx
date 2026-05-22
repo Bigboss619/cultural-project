@@ -42,6 +42,7 @@ const AdminSettings = lazy(() => import('./pages/AdminSettings.jsx'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage.jsx'));
 const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 const AdminPayment = lazy(() => import('./pages/AdminPayment.jsx'));
+const AdminPricing = lazy(() => import('./pages/AdminPricing.jsx'));
 
 
 const router = createBrowserRouter(
@@ -79,6 +80,7 @@ const router = createBrowserRouter(
           { path: '/admin/membership', element: <ProtectedRoute><AdminMembership /></ProtectedRoute> },
           { path: '/admin/settings', element: <ProtectedRoute><AdminSettings /></ProtectedRoute> },
           { path: '/admin/payments', element: <ProtectedRoute><AdminPayment /></ProtectedRoute> },
+          { path: '/admin/pricing', element: <ProtectedRoute><AdminPricing /></ProtectedRoute> },
           { path: '/admin/profile', element: <ProtectedRoute><AdminProfilePage /></ProtectedRoute> }
       ],
     },

@@ -18,6 +18,7 @@ import {
   LogOut,
   ChevronDown,
   DollarSign,
+  Tag,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -111,6 +112,12 @@ const AdminSidebar = () => {
       label: 'Payments',
       icon: DollarSign,
       path: '/admin/payments',
+    },
+    {
+      id: 'pricing',
+      label: 'Pricing',
+      icon: Tag,
+      path: '/admin/pricing',
     },
   ];
 
