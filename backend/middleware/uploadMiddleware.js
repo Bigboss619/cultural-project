@@ -13,6 +13,7 @@ function getSubDirectory(req) {
   if (baseUrl.includes('/post')) return 'blog';
   if (baseUrl.includes('/blog')) return 'blog';
   if (baseUrl.includes('/gallery')) return 'gallery';
+  if (baseUrl.includes('/member')) return 'members';
   return 'misc';
 }
 
