@@ -94,6 +94,12 @@ const AdminSidebar = () => {
       path: '/admin/testimonials',
     },
     {
+      id: 'membership',
+      label: 'Members',
+      icon: Users,
+      path: '/admin/membership',
+    },
+    {
       id: 'settings',
       label: 'Settings',
       icon: Settings,

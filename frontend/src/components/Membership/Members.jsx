@@ -1,65 +1,53 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const MEMBERS = [
-  {
-    id: 'adebayo',
-    name: 'Tayo Adebayo',
-    role: 'Cultural Curator',
-    bio: 'Brings Ibadan’s oral traditions to life through storytelling circles and community exhibitions.',
-    image: { label: 'TA', gradientFrom: '#B85C3C', gradientTo: '#1A1A1A' },
-  },
-  {
-    id: 'olakunle',
-    name: 'Kolawole Olakunle',
-    role: 'Youth Ambassador',
-    bio: 'Leads mentorship initiatives that connect young leaders with heritage projects and volunteer drives.',
-    image: { label: 'KO', gradientFrom: '#D4A574', gradientTo: '#B85C3C' },
-  },
-  {
-    id: 'babatunde',
-    name: 'Aminat Babatunde',
-    role: 'Community Liaison',
-    bio: 'Builds bridges across neighborhoods—coordinating events that celebrate culture, unity, and pride.',
-    image: { label: 'AB', gradientFrom: '#1A1A1A', gradientTo: '#B85C3C' },
-  },
-  {
-    id: 'adebisi',
-    name: 'Segun Adebisi',
-    role: 'Heritage Coordinator',
-    bio: 'Organizes preservation efforts and heritage walks to keep history visible for future generations.',
-    image: { label: 'SA', gradientFrom: '#8B4423', gradientTo: '#D4A574' },
-  },
-  {
-    id: 'oshun',
-    name: 'Kemi Oshun',
-    role: 'Arts & Performance Lead',
-    bio: 'Supports dance, drumming, and stagecraft—helping performers share authentic Ibadan expressions.',
-    image: { label: 'KO', gradientFrom: '#B85C3C', gradientTo: '#D4A574' },
-  },
-]
-
-function Avatar({ image, size = 'lg' }) {
-  const sizeClasses =
-    size === 'sm'
-      ? 'w-14 h-14'
-      : 'w-20 h-20'
-
-  return (
-    <div
-      className={`${sizeClasses} rounded-full flex items-center justify-center shadow-md`}
-      style={{
-        backgroundImage: `linear-gradient(135deg, ${image.gradientFrom}, ${image.gradientTo})`,
-      }}
-      aria-hidden="true"
-    >
-      <div className="text-white text-xl font-display font-bold">
-        {image.label}
-      </div>
-    </div>
-  )
-}
 const Members = () => {
-  const members = useMemo(() => MEMBERS, [])
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const resp = await axios.get('/api/public/members');
+        setMembers(resp.data.members || []);
+      } catch (err) {
+        console.error('Failed to fetch members:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMembers();
+  }, []);
+
+  if (loading) {
+    return (
+      <main>
+        <section className="container mx-auto px-4 md:px-8 py-12 md:py-16 max-w-6xl">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B85C3C]"></div>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (members.length === 0) {
+    return (
+      <main>
+        <section className="container mx-auto px-4 md:px-8 py-12 md:py-16 max-w-6xl">
+          <div className="mb-10">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-[#1A1A1A]">
+              Members
+            </h2>
+            <p className="font-body text-gray-700 mt-3 max-w-2xl">
+              A dedicated team committed to celebrating Ibadan&apos;s cultural heritage, mentoring youth, and strengthening community pride.
+            </p>
+          </div>
+          <p className="text-gray-500 text-center py-8">No members found.</p>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main>
@@ -70,7 +58,7 @@ const Members = () => {
             Members
           </h2>
           <p className="font-body text-gray-700 mt-3 max-w-2xl">
-            A dedicated team committed to celebrating Ibadan’s cultural heritage, mentoring youth, and strengthening community pride.
+            A dedicated team committed to celebrating Ibadan&apos;s cultural heritage, mentoring youth, and strengthening community pride.
           </p>
         </div>
 
@@ -82,7 +70,24 @@ const Members = () => {
             >
               <div className="p-6">
                 <div className="flex items-center gap-4">
-                  <Avatar image={m.image} />
+                  {m.image_url ? (
+                    <img
+                      src={`http://localhost:5000${m.image_url}`}
+                      alt={m.name}
+                      className="w-20 h-20 rounded-full object-cover shadow-md"
+                    />
+                  ) : (
+                    <div
+                      className="w-20 h-20 rounded-full flex items-center justify-center shadow-md"
+                      style={{
+                        backgroundImage: 'linear-gradient(135deg, #B85C3C, #1A1A1A)',
+                      }}
+                    >
+                      <div className="text-white text-xl font-display font-bold">
+                        {m.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </div>
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <h3 className="font-display text-xl font-bold text-[#1A1A1A] truncate">
                       {m.name}
@@ -100,10 +105,8 @@ const Members = () => {
         </div>
       </section>
 
-     
     </main>
-  )
-}
+  );
+};
 
-export default Members
-
+export default Members;

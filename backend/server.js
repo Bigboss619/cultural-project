@@ -24,6 +24,8 @@ const messageRoutes = require('./routes/messageRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const commentPublicRoutes = require('./routes/commentPublicRoutes');
+const memberRoutes = require('./routes/memberRoutes');
+const memberPublicRoutes = require('./routes/memberPublicRoutes');
 
 const app = express();
 
@@ -55,6 +57,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/public/comments', commentPublicRoutes);
+app.use('/api/members', memberRoutes);
+app.use('/api/public/members', memberPublicRoutes);
 
 const PORT = process.env.PORT || 5000;
 
