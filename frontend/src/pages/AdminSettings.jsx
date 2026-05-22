@@ -93,18 +93,18 @@ const AdminSettings = () => {
 
     const formData = new FormData();
 
-    // Text fields
+    // Add text fields (skip null and file objects)
     Object.entries(settings).forEach(([key, value]) => {
       if (value !== null && typeof value !== 'object') {
         formData.append(key, value);
       }
     });
 
-    // Image fields
-    if (settings.hero_image && typeof settings.hero_image !== 'string') {
+    // Add image files only if they are actual File objects
+    if (settings.hero_image instanceof File) {
       formData.append('hero_image', settings.hero_image);
     }
-    if (settings.about_image && typeof settings.about_image !== 'string') {
+    if (settings.about_image instanceof File) {
       formData.append('about_image', settings.about_image);
     }
 
@@ -112,7 +112,6 @@ const AdminSettings = () => {
       await axios.put(API_BASE, formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'multipart/form-data',
         },
       });
       setMessage({ type: 'success', text: 'Settings saved successfully!' });

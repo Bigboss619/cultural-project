@@ -31,69 +31,72 @@ async function getAllSettings(req, res) {
 // PUT /api/settings - Update multiple settings
 async function updateSettings(req, res) {
   try {
-    const { settings } = req.body || {};
+    // req.files when using upload.fields() is an object like { hero_image: [files], about_image: [files] }
+    const filesObj = req.files || {};
+    const textKeys = Object.keys(req.body || {});
 
-    if (!settings || typeof settings !== 'object') {
-      return res.status(400).json({ message: 'settings object is required' });
-    }
+    // Keys that have file uploads
+    const fileFieldNames = Object.keys(filesObj);
 
-    const keys = Object.keys(settings);
+    // Combine all unique text keys and file field names
+    const allKeys = [...new Set([...textKeys, ...fileFieldNames])];
 
-    for (const key of keys) {
-      const value = settings[key];
+    for (const key of allKeys) {
+      // Check if this key has a file upload
+      if (filesObj[key] && filesObj[key].length > 0) {
+        const file = filesObj[key][0]; // Get first file for this field
 
-      // Handle image uploads specially
-      if (req.files) {
-        const file = req.files.find(f => f.fieldname === key);
-        if (file) {
-          // Delete old image if exists
-          const old = await new Promise((resolve, reject) => {
-            db.query('SELECT setting_value FROM settings WHERE setting_key = ?', [key], (err, results) => {
-              if (err) return reject(err);
-              resolve(results && results[0] ? results[0] : null);
-            });
+        // Delete old image if exists
+        const old = await new Promise((resolve, reject) => {
+          db.query('SELECT setting_value FROM settings WHERE setting_key = ?', [key], (err, results) => {
+            if (err) return reject(err);
+            resolve(results && results[0] ? results[0] : null);
           });
+        });
 
-          if (old && old.setting_value) {
-            const oldPath = path.resolve(__dirname, '..', old.setting_value.replace(/^\//, ''));
-            if (fs.existsSync(oldPath)) {
-              fs.unlinkSync(oldPath);
-            }
+        if (old && old.setting_value) {
+          const oldPath = path.resolve(__dirname, '..', old.setting_value.replace(/^\//, ''));
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
           }
-
-          // Insert/update with new file path
-          const newValue = `/uploads/settings/${file.filename}`;
-          await new Promise((resolve, reject) => {
-            db.query(
-              `INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
-               ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()`,
-              [key, newValue],
-              (err) => {
-                if (err) return reject(err);
-                resolve();
-              }
-            );
-          });
-          continue;
         }
+
+        // Insert/update with new file path
+        const newValue = `/uploads/settings/${file.filename}`;
+        await new Promise((resolve, reject) => {
+          db.query(
+            `INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()`,
+            [key, newValue],
+            (err) => {
+              if (err) return reject(err);
+              resolve();
+            }
+          );
+        });
+        continue;
       }
 
       // Regular text update
-      await new Promise((resolve, reject) => {
-        db.query(
-          `INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
-           ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()`,
-          [key, value],
-          (err) => {
-            if (err) return reject(err);
-            resolve();
-          }
-        );
-      });
+      const value = req.body[key];
+      if (value !== undefined && value !== null) {
+        await new Promise((resolve, reject) => {
+          db.query(
+            `INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()`,
+            [key, String(value)],
+            (err) => {
+              if (err) return reject(err);
+              resolve();
+            }
+          );
+        });
+      }
     }
 
     return res.json({ message: 'Settings updated successfully' });
   } catch (err) {
+    console.error('Update settings error:', err);
     return res.status(500).json({ message: 'Failed to update settings', error: err.message });
   }
 }
