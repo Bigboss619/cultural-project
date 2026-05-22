@@ -107,19 +107,30 @@ async function updateMember(req, res) {
       return res.status(400).json({ message: 'bio is required' });
     }
 
+    // Get existing member data to check for old image
+    const existing = await new Promise((resolve, reject) => {
+      db.query('SELECT image_url FROM members WHERE id = ? LIMIT 1', [id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results && results[0] ? results[0] : null);
+      });
+    });
+
+    if (!existing) {
+      return res.status(404).json({ message: 'Member not found' });
+    }
+
     let imageUrl = null;
     if (req.file) {
       imageUrl = `/uploads/members/${req.file.filename}`;
-    } else {
-      const existing = await new Promise((resolve, reject) => {
-        db.query('SELECT image_url FROM members WHERE id = ? LIMIT 1', [id], (err, results) => {
-          if (err) return reject(err);
-          resolve(results && results[0] ? results[0] : null);
-        });
-      });
-      if (existing && existing.image_url) {
-        imageUrl = existing.image_url;
+      // Delete old image if it exists and we're uploading a new one
+      if (existing.image_url) {
+        const oldImagePath = path.resolve(__dirname, '..', existing.image_url.replace(/^\//, ''));
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
       }
+    } else {
+      imageUrl = existing.image_url;
     }
 
     const finalOrder = Number(display_order) || 0;
