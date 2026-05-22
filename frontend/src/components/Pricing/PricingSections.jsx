@@ -14,13 +14,14 @@ const COLORS = {
   textGray: '#666666',
 };
 
-// Membership tiers data
+// Membership tiers data - amounts in Naira
 const MEMBERSHIP_TIERS = [
   {
     id: 'community',
     name: 'Community Member',
     description: 'Join our community and stay connected',
     price: 'Free',
+    amount: 0,
     isHighlighted: false,
     buttonText: 'Join Now',
     features: [
@@ -35,6 +36,7 @@ const MEMBERSHIP_TIERS = [
     name: 'Active Member',
     description: 'Full participation in all programs',
     price: '₦5,000/year',
+    amount: 5000,
     isHighlighted: true,
     buttonText: 'Join Now',
     features: [
@@ -50,8 +52,9 @@ const MEMBERSHIP_TIERS = [
     name: 'Patron Member',
     description: 'Support our cultural mission',
     price: '₦25,000/year',
+    amount: 25000,
     isHighlighted: false,
-    buttonText: 'Join Now',
+    buttonText: 'Become a Patron',
     features: [
       'All Active Member benefits',
       'Recognition in annual report',
@@ -103,6 +106,7 @@ const PricingCardsSection = () => (
           name={tier.name}
           description={tier.description}
           price={tier.price}
+          amount={tier.amount}
           isHighlighted={tier.isHighlighted}
           buttonText={tier.buttonText}
           features={tier.features}

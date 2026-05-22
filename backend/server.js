@@ -28,6 +28,7 @@ const memberRoutes = require('./routes/memberRoutes');
 const memberPublicRoutes = require('./routes/memberPublicRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const settingsPublicRoutes = require('./routes/settingsPublicRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/public/members', memberPublicRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/public/settings', settingsPublicRoutes);
+app.use('/api/payments', paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
