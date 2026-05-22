@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 import './LoginForm.css';
@@ -17,6 +17,8 @@ const validatePassword = (password) => {
 
 export default function LoginForm() {
   const navigate = useNavigate(); // ✅ For redirect
+  const location = useLocation();
+  const [expiredMessage, setExpiredMessage] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -26,6 +28,13 @@ export default function LoginForm() {
   const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (location.state?.reason === 'session_expired') {
+      setExpiredMessage('Your session has expired due to inactivity. Please login again.');
+      window.history.replaceState({}, document.title, '/login');
+    }
+  }, [location.state]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -106,6 +115,7 @@ export default function LoginForm() {
 
       localStorage.setItem('authToken', token);
       localStorage.setItem('userRole', user?.role);
+      localStorage.setItem('lastActivity', Date.now().toString());
 
       setSuccessMessage('Login successful! Redirecting...');
 
@@ -146,6 +156,7 @@ export default function LoginForm() {
 
       {errors.submit && <div className="error-alert">{errors.submit}</div>}
       {successMessage && <div className="success-alert">{successMessage}</div>}
+      {expiredMessage && <div className="success-alert">{expiredMessage}</div>}
 
       <div className="form-group">
         <label htmlFor="email">Email Address</label>
