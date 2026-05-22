@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const Footer = () => {
   const [socialLinks, setSocialLinks] = useState({
@@ -12,7 +12,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await axios.get('/api/public/settings');
+        const resp = await api.get('/public/settings');
         const data = resp.data.settings || {};
         setSocialLinks({
           social_facebook: data.social_facebook || '#',

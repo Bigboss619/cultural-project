@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 function NewsletterIcon() {
   return (
@@ -38,7 +38,7 @@ const SubscribeEventForm = () => {
       setErrorMessage('');
 
       // Make API call to subscribe
-      await axios.post('/api/newsletter/subscribe', { email });
+      await api.post('/newsletter/subscribe', { email });
 
       setStatus('success');
       setEmail('');

@@ -1,6 +1,6 @@
 // NewArticle.jsx - Backend-connected version
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import RichTextEditor from '../components/Post/RichTextEditor';
@@ -52,7 +52,7 @@ const NewArticle = () => {
       setCategoriesLoading(true);
       setCategoriesError('');
 
-      const resp = await axios.get('/api/categories', {
+      const resp = await api.get('/categories', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -73,7 +73,7 @@ const NewArticle = () => {
     try {
       setFormError('');
 
-      const resp = await axios.get(`/api/posts/${postId}`, {
+      const resp = await api.get(`/posts/${postId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -199,11 +199,11 @@ const NewArticle = () => {
 
     try {
       if (isEdit) {
-        await axios.put(`/api/posts/${id}`, payload, {
+        await api.put(`/posts/${id}`, payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
       } else {
-        await axios.post('/api/posts', payload, {
+        await api.post('/posts', payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
       }

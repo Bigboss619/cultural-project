@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const OurStory = () => {
   const [settings, setSettings] = useState({
@@ -12,7 +12,7 @@ const OurStory = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await axios.get('/api/public/settings');
+        const resp = await api.get('/public/settings');
         const data = resp.data.settings || {};
         setSettings({
           about_heading: data.about_heading || 'Preserving Heritage, Building Community',

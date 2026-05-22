@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { FeaturedPostsPanel, PostsFeatures, PostsList, PostsToolbar } from '../components/Post';
@@ -27,7 +27,7 @@ const Posts = () => {
     setPostsError('');
 
     try {
-      const resp = await axios.get('/api/posts', {
+      const resp = await api.get('/posts', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const HeroSection = () => {
   const [settings, setSettings] = useState({
@@ -13,7 +13,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await axios.get('/api/public/settings');
+        const resp = await api.get('/public/settings');
         const data = resp.data.settings || {};
         setSettings({
           hero_image: data.hero_image || null,

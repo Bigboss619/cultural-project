@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 import { useTheme, useSidebar } from './AdminLayout';
 
 import {
@@ -43,7 +43,7 @@ const AdminHeader = () => {
     if (!authToken) return;
 
     try {
-      const resp = await axios.get('/api/dashboard/stats', {
+      const resp = await api.get('/dashboard/stats', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setNotifications({
@@ -66,7 +66,7 @@ const AdminHeader = () => {
     setProfileLoading(true);
     setProfileError('');
     try {
-      const resp = await axios.get('/api/auth/profile', {
+      const resp = await api.get('/auth/profile', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

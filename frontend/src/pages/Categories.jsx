@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 
@@ -63,7 +63,7 @@ const Categories = () => {
           return;
         }
 
-        const resp = await axios.get('/api/categories', {
+        const resp = await api.get('/categories', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -107,7 +107,7 @@ const Categories = () => {
   };
 
   const refreshCategories = async () => {
-    const resp = await axios.get('/api/categories', {
+    const resp = await api.get('/categories', {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -130,8 +130,8 @@ const Categories = () => {
       setError('');
 
       if (editId == null) {
-        await axios.post(
-          '/api/categories',
+        await api.post(
+          '/categories',
           { name, description },
           {
             headers: {
@@ -140,8 +140,8 @@ const Categories = () => {
           }
         );
       } else {
-        await axios.put(
-          `/api/categories/${editId}`,
+        await api.put(
+          `/categories/${editId}`,
           { name, description },
           {
             headers: {
@@ -173,7 +173,7 @@ const Categories = () => {
       setLoading(true);
       setError('');
 
-      await axios.delete(`/api/categories/${cat.id}`, {
+      await api.delete(`/categories/${cat.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

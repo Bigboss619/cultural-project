@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import axios from 'axios';
+import api from '../config/axios';
 import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
 
 const AdminMembership = () => {
@@ -14,11 +14,10 @@ const AdminMembership = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const authToken = localStorage.getItem('authToken');
-  const API_BASE = '/api/members';
 
   const fetchMembers = async () => {
     try {
-      const resp = await axios.get(API_BASE, {
+      const resp = await api.get('/members', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setMembers(resp.data.members || []);
@@ -95,7 +94,7 @@ const AdminMembership = () => {
           },
         });
       } else {
-        await axios.post(API_BASE, submitData, {
+        await api.post('/members', submitData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'multipart/form-data',

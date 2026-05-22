@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import axios from 'axios';
+import api from '../config/axios';
 import {
   Users,
   FileText,
@@ -25,7 +25,7 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const response = await axios.get('/api/dashboard/stats', {
+        const response = await api.get('/dashboard/stats', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStats(response.data);

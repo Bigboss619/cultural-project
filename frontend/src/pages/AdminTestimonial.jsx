@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Plus, RefreshCw, Edit2, Trash2, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const TestimonialForm = ({ testimonial, onSuccess, onCancel }) => {
@@ -80,7 +80,7 @@ const TestimonialForm = ({ testimonial, onSuccess, onCancel }) => {
         await axios.put(`/api/testimonials/${testimonial.id}`, formPayload, { headers });
         showSuccess('Testimonial updated successfully');
       } else {
-        await axios.post('/api/testimonials', formPayload, { headers });
+        await api.post('/testimonials', formPayload, { headers });
         showSuccess('Testimonial created successfully');
       }
 
@@ -233,7 +233,7 @@ const AdminTestimonial = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/testimonials', {
+      const resp = await api.get('/testimonials', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

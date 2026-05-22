@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 import { X, CreditCard, Loader } from 'lucide-react';
 
 const PaymentModal = ({ isOpen, onClose, amount, description = 'Membership Payment', paymentType = 'membership', onSuccess }) => {
@@ -26,7 +26,7 @@ const PaymentModal = ({ isOpen, onClose, amount, description = 'Membership Payme
     setError('');
 
     try {
-      const response = await axios.post('/api/payments/initialize', {
+      const response = await api.post('/payments/initialize', {
         email: email.trim(),
         amount: amount,
         customer_name: name.trim(),

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 const Members = () => {
   const [members, setMembers] = useState([]);
@@ -8,7 +8,7 @@ const Members = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const resp = await axios.get('/api/public/members');
+        const resp = await api.get('/public/members');
         setMembers(resp.data.members || []);
       } catch (err) {
         console.error('Failed to fetch members:', err);

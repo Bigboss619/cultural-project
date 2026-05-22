@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Plus, RefreshCw, Edit2, Trash2, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const ExecutiveForm = ({ executive, onSuccess, onCancel }) => {
@@ -80,7 +80,7 @@ const ExecutiveForm = ({ executive, onSuccess, onCancel }) => {
         await axios.put(`/api/executives/${executive.id}`, formPayload, { headers });
         showSuccess('Executive updated successfully');
       } else {
-        await axios.post('/api/executives', formPayload, { headers });
+        await api.post('/executives', formPayload, { headers });
         showSuccess('Executive created successfully');
       }
 
@@ -233,7 +233,7 @@ const AdminExecutive = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/executives', {
+      const resp = await api.get('/executives', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

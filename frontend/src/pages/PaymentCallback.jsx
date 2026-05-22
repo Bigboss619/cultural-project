@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import { CheckCircle, XCircle, Loader, Home } from 'lucide-react';
 import Container from '../components/layout/Container';
 
@@ -18,7 +18,7 @@ const PaymentCallback = () => {
       }
 
       try {
-        const resp = await axios.get(`/api/payments/verify/${reference}`);
+        const resp = await api.get(`/payments/verify/${reference}`);
         const data = resp.data.data;
 
         if (data.status === 'success') {

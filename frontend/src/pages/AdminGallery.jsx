@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Plus, RefreshCw, Edit2, Trash2, X, Image as ImageIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const GalleryForm = ({ item, categories, onSuccess, onCancel }) => {
@@ -84,7 +84,7 @@ const GalleryForm = ({ item, categories, onSuccess, onCancel }) => {
         await axios.put(`/api/gallery/${item.id}`, formPayload, { headers });
         showSuccess('Gallery item updated successfully');
       } else {
-        await axios.post('/api/gallery', formPayload, { headers });
+        await api.post('/gallery', formPayload, { headers });
         showSuccess('Gallery item created successfully');
       }
 
@@ -241,7 +241,7 @@ const AdminGallery = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/gallery', {
+      const resp = await api.get('/gallery', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -257,7 +257,7 @@ const AdminGallery = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const resp = await axios.get('/api/public/categories');
+      const resp = await api.get('/public/categories');
       setCategories(resp.data?.categories || []);
     } catch (err) {
       console.warn('Failed to fetch categories', err);
@@ -266,7 +266,7 @@ const AdminGallery = () => {
 
   // const fetchCategories = useCallback(async () => {
   //   try {
-  //     const resp = await axios.get('/api/public/categories');
+  //     const resp = await api.get('/public/categories');
   //     setCategories(resp.data?.categories || []);
   //   } catch (err) {
   //     console.warn('Failed to fetch categories', err);

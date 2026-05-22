@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from '../config/axios';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { Edit2, Trash2, Lock, Shield } from 'lucide-react';
 import UserHeader from '../components/AdminUsers/UserHeader';
@@ -102,7 +102,7 @@ const Users = () => {
         setLoading(true);
         setError('');
 
-        const resp = await axios.get('/api/users', {
+        const resp = await api.get('/users', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

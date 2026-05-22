@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_URL from '../../config/api';
 
 import './LoginForm.css';
-
-// const API_BASE = 'http://localhost:5000';
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -102,7 +101,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const resp = await axios.post('/api/auth/login', {
+      const resp = await axios.post(`${API_URL}/auth/login`, {
         email: formData.email,
         password: formData.password,
       });

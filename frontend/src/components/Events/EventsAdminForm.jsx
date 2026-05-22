@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
-import axios from 'axios';
+import api from '../../config/axios';
 import { useToast } from '../toast/ToastProvider';
 
 const DEFAULT_FORM = {
@@ -61,7 +61,7 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
       }
 
       try {
-        const resp = await axios.get('/api/categories', {
+        const resp = await api.get('/categories', {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setCategories(resp.data?.categories || []);
@@ -190,7 +190,7 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
         isNew = false;
         showSuccess('Event updated successfully');
       } else {
-        const resp = await axios.post('/api/events', payload, {
+        const resp = await api.post('/events', payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         savedEvent = { ...payload, id: resp.data.eventId };

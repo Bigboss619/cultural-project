@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 function ClockIcon() {
   return (
@@ -116,7 +116,7 @@ const Content = () => {
       try {
         setLoading(true);
         setError(null);
-        const resp = await axios.get('/api/public/posts/featured');
+        const resp = await api.get('/public/posts/featured');
         if (resp.data?.post) {
           setFeaturedPost(resp.data.post);
         }

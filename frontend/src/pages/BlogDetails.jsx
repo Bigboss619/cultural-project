@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config/axios';
 import { Share2 } from 'lucide-react';
 import Container from '../components/layout/Container';
 
@@ -149,7 +149,7 @@ const CommentSection = ({ postId }) => {
     setSubmitting(true);
 
     try {
-      await axios.post('/api/public/comments', {
+      await api.post('/public/comments', {
         post_id: postId,
         author_name: name,
         author_email: email,

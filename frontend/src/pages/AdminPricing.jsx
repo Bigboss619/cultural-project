@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import axios from 'axios';
+import api from '../config/axios';
 import { Save, Plus, Trash2 } from 'lucide-react';
 
 const AdminPricing = () => {
@@ -37,7 +37,7 @@ const AdminPricing = () => {
   // Load pricing from settings
   const fetchPricing = async () => {
     try {
-      const resp = await axios.get('/api/settings', { headers: { Authorization: `Bearer ${authToken}` } });
+      const resp = await api.get('/settings', { headers: { Authorization: `Bearer ${authToken}` } });
       const settings = resp.data.settings || {};
 
       // Load saved pricing if exists
@@ -109,7 +109,7 @@ const AdminPricing = () => {
       formData.append('pricing_active', JSON.stringify(pricing.active));
       formData.append('pricing_patron', JSON.stringify(pricing.patron));
 
-      await axios.put('/api/settings', formData, {
+      await api.put('/settings', formData, {
         headers: { Authorization: `Bearer ${authToken}` }
       });
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { RefreshCw, Trash2, Check, X, MessageSquare, Search, Filter } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const AdminComments = () => {
@@ -28,7 +28,7 @@ const AdminComments = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/comments', {
+      const resp = await api.get('/comments', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -49,7 +49,7 @@ const AdminComments = () => {
   const handleApprove = async (id, approved) => {
     try {
       setModeratingId(id);
-      await axios.patch(`/api/comments/${id}/approve`, { approved }, {
+      await api.patch(`/comments/${id}/approve`, { approved }, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -67,7 +67,7 @@ const AdminComments = () => {
 
     try {
       setDeletingId(id);
-      await axios.delete(`/api/comments/${id}`, {
+      await api.delete(`/comments/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

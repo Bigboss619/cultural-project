@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { RefreshCw, Trash2, Mail, MailOpen, Search, Send, MessageSquare } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const AdminMessages = () => {
@@ -31,7 +31,7 @@ const AdminMessages = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/messages', {
+      const resp = await api.get('/messages', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

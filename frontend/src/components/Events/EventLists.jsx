@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 function CalendarIcon() {
   return (
@@ -176,7 +176,7 @@ const EventLists = () => {
         setLoading(true);
         setError(null);
 
-        const resp = await axios.get('/api/public/events');
+        const resp = await api.get('/public/events');
         setEvents(resp.data?.events || []);
       } catch (err) {
         console.error('Failed to fetch events:', err);

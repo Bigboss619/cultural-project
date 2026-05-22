@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 import { Clock } from 'lucide-react';
 
 // Color constants
@@ -161,7 +161,7 @@ const Category = () => {
       setError(null);
 
       const params = categoryId && categoryId !== 'all' ? { category_id: categoryId } : {};
-      const resp = await axios.get('/api/public/posts', { params });
+      const resp = await api.get('/public/posts', { params });
 
       const postsData = resp.data?.posts || [];
       setPosts(postsData);

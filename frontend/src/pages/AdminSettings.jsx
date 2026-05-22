@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import axios from 'axios';
+import api from '../config/axios';
 import { Save, Image as ImageIcon, X } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -35,11 +35,10 @@ const AdminSettings = () => {
   });
 
   const authToken = localStorage.getItem('authToken');
-  const API_BASE = '/api/settings';
 
   const fetchSettings = async () => {
     try {
-      const resp = await axios.get(API_BASE, {
+      const resp = await api.get('/settings', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -109,7 +108,7 @@ const AdminSettings = () => {
     }
 
     try {
-      await axios.put(API_BASE, formData, {
+      await api.put('/settings', formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../config/axios';
 
 function ContactInfoItem({ icon, title, children }) {
   return (
@@ -44,7 +44,7 @@ const ContactInfo = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await axios.get('/api/public/settings');
+        const resp = await api.get('/public/settings');
         const data = resp.data.settings || {};
         setContact({
           contact_location: data.contact_location || 'Ibadan, Oyo State\nNigeria',

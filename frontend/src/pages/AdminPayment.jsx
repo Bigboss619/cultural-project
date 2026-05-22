@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import axios from 'axios';
+import api from '../config/axios';
 import { DollarSign, CheckCircle, XCircle, Clock, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const AdminPayment = () => {
@@ -23,7 +23,7 @@ const AdminPayment = () => {
 
       const [paymentsResp, statsResp] = await Promise.all([
         axios.get(`/api/payments?${params}`, { headers: { Authorization: `Bearer ${authToken}` } }),
-        axios.get('/api/payments/stats', { headers: { Authorization: `Bearer ${authToken}` } })
+        api.get('/payments/stats', { headers: { Authorization: `Bearer ${authToken}` } })
       ]);
 
       setPayments(paymentsResp.data.payments || []);

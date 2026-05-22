@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
 import { User, Mail, Phone, FileText, Lock, Save, Eye, EyeOff } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/axios';
 import { useToast } from '../components/toast';
 
 const AdminProfilePage = () => {
@@ -43,7 +43,7 @@ const AdminProfilePage = () => {
     try {
       setLoading(true);
       setError(null);
-      const resp = await axios.get('/api/auth/me', {
+      const resp = await api.get('/auth/me', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -79,7 +79,7 @@ const AdminProfilePage = () => {
 
     try {
       setSaving(true);
-      const resp = await axios.put('/api/auth/profile', {
+      const resp = await api.put('/auth/profile', {
         name: profileForm.name,
         phone: profileForm.phone,
         bio: profileForm.bio,
@@ -118,7 +118,7 @@ const AdminProfilePage = () => {
 
     try {
       setSaving(true);
-      await axios.put('/api/auth/change-password', {
+      await api.put('/auth/change-password', {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
       }, {
