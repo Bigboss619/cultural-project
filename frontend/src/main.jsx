@@ -40,6 +40,8 @@ const AdminTestimonials = lazy(() => import('./pages/AdminTestimonial.jsx'));
 const AdminMembership = lazy(() => import('./pages/AdminMembership.jsx'));
 const AdminSettings = lazy(() => import('./pages/AdminSettings.jsx'));
 const AdminProfilePage = lazy(() => import('./pages/AdminProfilePage.jsx'));
+const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
+const AdminPayment = lazy(() => import('./pages/AdminPayment.jsx'));
 
 
 const router = createBrowserRouter(
@@ -58,6 +60,7 @@ const router = createBrowserRouter(
         { path: '/blog/:slug', element: <BlogDetails /> },
         { path: '/membership', element: <Membership />},
         { path: '/pricing', element: <Pricing />},
+        { path: '/payment/callback', element: <PaymentCallback /> },
         { path: '/login', element: <Login /> },
           // Admin Routes (protected)
           { path: '/admin', element: <ProtectedRoute><AdminDashboard /></ProtectedRoute> },
@@ -75,6 +78,7 @@ const router = createBrowserRouter(
           { path: '/admin/testimonials', element: <ProtectedRoute><AdminTestimonials /></ProtectedRoute> },
           { path: '/admin/membership', element: <ProtectedRoute><AdminMembership /></ProtectedRoute> },
           { path: '/admin/settings', element: <ProtectedRoute><AdminSettings /></ProtectedRoute> },
+          { path: '/admin/payments', element: <ProtectedRoute><AdminPayment /></ProtectedRoute> },
           { path: '/admin/profile', element: <ProtectedRoute><AdminProfilePage /></ProtectedRoute> }
       ],
     },
