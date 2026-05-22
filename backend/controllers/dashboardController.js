@@ -45,7 +45,7 @@ async function getDashboardStats(req, res) {
       runQuery("SELECT COUNT(*) as count FROM posts WHERE status = 'published'"),
       runQuery("SELECT COUNT(*) as count FROM events WHERE event_date >= CURDATE()"),
       runQuery("SELECT COUNT(*) as count FROM comments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"),
-      runQuery("SELECT COUNT(*) as count FROM comments WHERE status = 'pending'"),
+      runQuery("SELECT COUNT(*) as count FROM comments WHERE approved = 0"),
       runQuery("SELECT COUNT(*) as count FROM gallery"),
       runQuery("SELECT COUNT(*) as count FROM messages WHERE is_read = 0"),
       runQuery("SELECT COUNT(*) as count FROM testimonials WHERE status = 'published'"),
