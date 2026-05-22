@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
+import axios from 'axios';
 import {
   Users,
   FileText,
@@ -11,56 +12,98 @@ import {
   Clock,
   CheckCircle2,
   Inbox,
+  Mail,
+  TrendingUp,
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  // Mock data (no API calls)
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await axios.get('/api/dashboard/stats', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStats(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to fetch dashboard stats:', err);
+        setError('Failed to load dashboard data');
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="text-center text-red-600 py-8">{error}</div>
+      </AdminLayout>
+    );
+  }
+
   const overview = [
     {
       title: 'Total users',
-      value: '1,234',
+      value: stats?.totalUsers || 0,
       icon: Users,
       accent: 'blue',
     },
     {
       title: 'Total posts',
-      value: '567',
+      value: stats?.totalPosts || 0,
       icon: FileText,
       accent: 'green',
     },
     {
       title: 'Upcoming events',
-      value: '3',
+      value: stats?.upcomingEvents || 0,
       icon: Calendar,
       accent: 'orange',
-      note: 'Next: Heritage Night',
+      note: stats?.nextEvent ? `Next: ${stats.nextEvent.title}` : 'None scheduled',
     },
     {
       title: 'Recent comments',
-      value: '42',
+      value: stats?.recentComments || 0,
       icon: MessageSquare,
       accent: 'purple',
-      note: '5 need review',
+      note: stats?.pendingComments ? `${stats.pendingComments} need review` : 'All reviewed',
     },
     {
       title: 'Total gallery items',
-      value: '214',
+      value: stats?.totalGalleryItems || 0,
       icon: Image,
       accent: 'teal',
     },
   ];
 
   const notifications = [
-    { title: 'Comment moderation', subtitle: '5 pending approvals', icon: Inbox, accent: 'blue' },
-    { title: 'Event registration', subtitle: 'New RSVP on Upcoming Events', icon: Clock, accent: 'orange' },
-    { title: 'Content publishing', subtitle: '2 articles published today', icon: CheckCircle2, accent: 'green' },
+    { title: 'Unread messages', subtitle: `${stats?.unreadMessages || 0} new messages`, icon: Mail, accent: 'blue' },
+    { title: 'Pending comments', subtitle: `${stats?.pendingComments || 0} need review`, icon: Inbox, accent: 'purple' },
+    { title: 'Upcoming events', subtitle: `${stats?.upcomingEvents || 0} events scheduled`, icon: Calendar, accent: 'orange' },
   ];
 
   const exampleCards = [
-    { title: 'Total Members', value: '1,234', icon: Star, accent: 'blue' },
-    { title: 'Active Events', value: '6', icon: Calendar, accent: 'orange' },
-    { title: 'Published Articles', value: '48', icon: FileText, accent: 'green' },
-    { title: 'Pending Comments', value: '5', icon: MessageSquare, accent: 'purple' },
+    { title: 'Approved testimonials', value: stats?.approvedTestimonials || 0, icon: Star, accent: 'blue' },
+    { title: 'Total posts', value: stats?.totalPosts || 0, icon: FileText, accent: 'green' },
+    { title: 'Total users', value: stats?.totalUsers || 0, icon: Users, accent: 'orange' },
+    { title: 'Pending comments', value: stats?.pendingComments || 0, icon: MessageSquare, accent: 'purple' },
   ];
 
   const colorClasses = {
