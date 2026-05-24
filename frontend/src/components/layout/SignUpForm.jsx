@@ -137,7 +137,7 @@ export default function SignupForm() {
 
     try {
       // const response = await axios.post(`${API_BASE}/api/auth/register`, {
-      const response = await api.post('/auth/register', {
+      const response = await api.post('/api/auth/register', {
         // backend expects `name`, not `fullName`
         name: formData.fullName,
         email: formData.email,

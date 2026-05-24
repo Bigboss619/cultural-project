@@ -102,7 +102,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const resp = await api.post('/auth/login', {
+      const resp = await api.post('/api/auth/login', {
         email: formData.email,
         password: formData.password,
       });
