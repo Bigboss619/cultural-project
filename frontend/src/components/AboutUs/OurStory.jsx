@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../config/axios';
+import api, { BASE_URL } from '../../config/axios';
 
 const OurStory = () => {
   const [settings, setSettings] = useState({
@@ -19,7 +19,7 @@ const OurStory = () => {
           about_content: data.about_content || 'Legacy Stars of Ibadan stands as a beacon of cultural pride and community excellence.',
         });
         if (data.about_image) {
-          setAboutImage(`http://localhost:5000${data.about_image}`);
+          setAboutImage(`${BASE_URL}${data.about_image}`);
         }
       } catch (err) {
         console.error('Failed to fetch about settings:', err);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import api from '../config/axios';
+import api, { BASE_URL } from '../config/axios';
 import { Save, Image as ImageIcon, X } from 'lucide-react';
 
 const AdminSettings = () => {
@@ -59,10 +59,10 @@ const AdminSettings = () => {
       }));
 
       if (data.hero_image) {
-        setPreviewImages(prev => ({ ...prev, hero_image: `http://localhost:5000${data.hero_image}` }));
+        setPreviewImages(prev => ({ ...prev, hero_image: `${BASE_URL}${data.hero_image}` }));
       }
       if (data.about_image) {
-        setPreviewImages(prev => ({ ...prev, about_image: `http://localhost:5000${data.about_image}` }));
+        setPreviewImages(prev => ({ ...prev, about_image: `${BASE_URL}${data.about_image}` }));
       }
     } catch (err) {
       console.error('Failed to fetch settings:', err);

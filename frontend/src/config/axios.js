@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_URL || BASE_URL;
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_URL || (BASE_URL + '/uploads');
 
 const api = axios.create({
   baseURL: BASE_URL,

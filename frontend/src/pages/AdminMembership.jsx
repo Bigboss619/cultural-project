@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '../components/DashboardLayout/AdminLayout';
-import api from '../config/axios';
+import api, { BASE_URL } from '../config/axios';
 import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
 
 const AdminMembership = () => {
@@ -47,7 +47,7 @@ const AdminMembership = () => {
         bio: member.bio,
         image: null,
       });
-      setPreviewImage(member.image_url ? `http://localhost:5000${member.image_url}` : null);
+      setPreviewImage(member.image_url ? `${BASE_URL}${member.image_url}` : null);
     } else {
       resetForm();
     }
@@ -173,7 +173,7 @@ const AdminMembership = () => {
                 <div className="h-48 bg-gradient-to-br from-amber-600 to-orange-700 flex items-center justify-center">
                   {member.image_url ? (
                     <img
-                      src={`http://localhost:5000${member.image_url}`}
+                      src={`${BASE_URL}${member.image_url}`}
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />

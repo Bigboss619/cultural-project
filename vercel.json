@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "cd backend && npm install",
+  "outputDirectory": ".",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/server"
+    }
+  ]
+}
+
+

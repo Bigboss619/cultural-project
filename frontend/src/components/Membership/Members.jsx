@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../config/axios';
+import api, { BASE_URL } from '../../config/axios';
 
 const Members = () => {
   const [members, setMembers] = useState([]);
@@ -72,7 +72,7 @@ const Members = () => {
                 <div className="flex items-center gap-4">
                   {m.image_url ? (
                     <img
-                      src={`http://localhost:5000${m.image_url}`}
+                      src={`${BASE_URL}${m.image_url}`}
                       alt={m.name}
                       className="w-20 h-20 rounded-full object-cover shadow-md"
                     />
