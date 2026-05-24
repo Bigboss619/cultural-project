@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api, { IMAGE_BASE_URL } from '../../config/axios';
+import api, { BASE_URL } from '../../config/axios';
 
 const HeroSection = () => {
   const [settings, setSettings] = useState({
@@ -15,6 +15,22 @@ const HeroSection = () => {
       try {
         const resp = await api.get('/api/public/settings');
         const data = resp.data.settings || {};
+        const imageUrl = data.hero_image
+          ? `${BASE_URL}${data.hero_image}`
+          : '/images/hero-banner.jpg';
+
+        // Preload image before displaying
+        const img = new Image();
+        img.src = imageUrl;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = () => {
+            // Fall back to local image if CDN fails
+            img.src = '/images/hero-banner.jpg';
+            img.onload = resolve;
+          };
+        });
+
         setSettings({
           hero_image: data.hero_image || null,
           hero_heading: data.hero_heading || 'Legacy Stars of Ibadan',
@@ -29,9 +45,16 @@ const HeroSection = () => {
     fetchSettings();
   }, []);
 
-  const backgroundImage = settings.hero_image
-    ? `url(${IMAGE_BASE_URL}${settings.hero_image})`
-    : "url('/images/hero-banner.jpg')";
+  const getHeroImageUrl = () => {
+    // hero_image from DB already contains the full path like /uploads/settings/filename.jpg
+    if (settings.hero_image && settings.hero_image.trim() !== '') {
+      const fullUrl = `${BASE_URL}${settings.hero_image}`;
+      return fullUrl;
+    }
+    return "url('/images/hero-banner.jpg')";
+  };
+
+  const backgroundImage = getHeroImageUrl();
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
