@@ -63,7 +63,7 @@ const AdminEvents = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await axios.get('/api/events', {
+      const resp = await api.get('/api/events', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -86,7 +86,7 @@ const AdminEvents = () => {
 
     try {
       setDeletingId(eventId);
-      await axios.delete(`/api/events/${eventId}`, {
+      await api.delete(`/api/events/${eventId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

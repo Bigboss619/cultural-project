@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../../config/axios';
+import api, { IMAGE_BASE_URL } from '../../config/axios';
 
 const HeroSection = () => {
   const [settings, setSettings] = useState({
@@ -13,7 +13,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await api.get('/public/settings');
+        const resp = await api.get('/api/public/settings');
         const data = resp.data.settings || {};
         setSettings({
           hero_image: data.hero_image || null,
@@ -30,7 +30,7 @@ const HeroSection = () => {
   }, []);
 
   const backgroundImage = settings.hero_image
-    ? `url(http://localhost:5000${settings.hero_image})`
+    ? `url(${IMAGE_BASE_URL}${settings.hero_image})`
     : "url('/images/hero-banner.jpg')";
 
   return (

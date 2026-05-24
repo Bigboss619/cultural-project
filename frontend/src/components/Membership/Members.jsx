@@ -8,7 +8,7 @@ const Members = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const resp = await api.get('/public/members');
+        const resp = await api.get('/api/public/members');
         setMembers(resp.data.members || []);
       } catch (err) {
         console.error('Failed to fetch members:', err);

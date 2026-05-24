@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../../config/api';
+import api from '../../config/axios';
 
 import './LoginForm.css';
 
@@ -101,7 +102,7 @@ export default function LoginForm() {
     setIsLoading(true);
 
     try {
-      const resp = await axios.post(`${API_URL}/auth/login`, {
+      const resp = await api.post('/auth/login', {
         email: formData.email,
         password: formData.password,
       });

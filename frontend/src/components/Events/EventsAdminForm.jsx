@@ -61,7 +61,7 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
       }
 
       try {
-        const resp = await api.get('/categories', {
+        const resp = await api.get('/api/categories', {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         setCategories(resp.data?.categories || []);
@@ -183,14 +183,14 @@ export default function EventsAdminForm({ event, onSuccess, onCancel }) {
       let isNew = true;
 
       if (isEdit) {
-        await axios.put(`/api/events/${event.id}`, payload, {
+        await api.put(`/api/events/${event.id}`, payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         savedEvent = { ...event, ...payload };
         isNew = false;
         showSuccess('Event updated successfully');
       } else {
-        const resp = await api.post('/events', payload, {
+        const resp = await api.post('/api/events', payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         savedEvent = { ...payload, id: resp.data.eventId };

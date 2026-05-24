@@ -81,10 +81,10 @@ const GalleryForm = ({ item, categories, onSuccess, onCancel }) => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/gallery/${item.id}`, formPayload, { headers });
+        await api.put(`/api/gallery/${item.id}`, formPayload, { headers });
         showSuccess('Gallery item updated successfully');
       } else {
-        await api.post('/gallery', formPayload, { headers });
+        await api.post('/api/gallery', formPayload, { headers });
         showSuccess('Gallery item created successfully');
       }
 
@@ -241,7 +241,7 @@ const AdminGallery = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await api.get('/gallery', {
+      const resp = await api.get('/api/gallery', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -257,7 +257,7 @@ const AdminGallery = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const resp = await api.get('/public/categories');
+      const resp = await api.get('/api/public/categories');
       setCategories(resp.data?.categories || []);
     } catch (err) {
       console.warn('Failed to fetch categories', err);
@@ -266,7 +266,7 @@ const AdminGallery = () => {
 
   // const fetchCategories = useCallback(async () => {
   //   try {
-  //     const resp = await api.get('/public/categories');
+  //     const resp = await api.get('/api/public/categories');
   //     setCategories(resp.data?.categories || []);
   //   } catch (err) {
   //     console.warn('Failed to fetch categories', err);
@@ -283,7 +283,7 @@ const AdminGallery = () => {
 
     try {
       setDeletingId(itemId);
-      await axios.delete(`/api/gallery/${itemId}`, {
+      await api.delete(`/api/gallery/${itemId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

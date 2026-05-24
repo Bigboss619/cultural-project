@@ -44,7 +44,7 @@ const ContactInfo = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await api.get('/public/settings');
+        const resp = await api.get('/api/public/settings');
         const data = resp.data.settings || {};
         setContact({
           contact_location: data.contact_location || 'Ibadan, Oyo State\nNigeria',

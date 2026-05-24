@@ -77,10 +77,10 @@ const ExecutiveForm = ({ executive, onSuccess, onCancel }) => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/executives/${executive.id}`, formPayload, { headers });
+        await api.put(`/api/executives/${executive.id}`, formPayload, { headers });
         showSuccess('Executive updated successfully');
       } else {
-        await api.post('/executives', formPayload, { headers });
+        await api.post('/api/executives', formPayload, { headers });
         showSuccess('Executive created successfully');
       }
 
@@ -233,7 +233,7 @@ const AdminExecutive = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await api.get('/executives', {
+      const resp = await api.get('/api/executives', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -256,7 +256,7 @@ const AdminExecutive = () => {
 
     try {
       setDeletingId(executiveId);
-      await axios.delete(`/api/executives/${executiveId}`, {
+      await api.delete(`/api/executives/${executiveId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

@@ -38,7 +38,7 @@ const SubscribeEventForm = () => {
       setErrorMessage('');
 
       // Make API call to subscribe
-      await api.post('/newsletter/subscribe', { email });
+      await api.post('/api/newsletter/subscribe', { email });
 
       setStatus('success');
       setEmail('');

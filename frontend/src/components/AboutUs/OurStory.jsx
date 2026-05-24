@@ -12,7 +12,7 @@ const OurStory = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await api.get('/public/settings');
+        const resp = await api.get('/api/public/settings');
         const data = resp.data.settings || {};
         setSettings({
           about_heading: data.about_heading || 'Preserving Heritage, Building Community',

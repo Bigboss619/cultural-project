@@ -43,7 +43,7 @@ const AdminHeader = () => {
     if (!authToken) return;
 
     try {
-      const resp = await api.get('/dashboard/stats', {
+      const resp = await api.get('/api/dashboard/stats', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setNotifications({
@@ -66,7 +66,7 @@ const AdminHeader = () => {
     setProfileLoading(true);
     setProfileError('');
     try {
-      const resp = await api.get('/auth/profile', {
+      const resp = await api.get('/api/auth/profile', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

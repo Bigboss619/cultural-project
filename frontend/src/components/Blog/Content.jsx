@@ -116,7 +116,7 @@ const Content = () => {
       try {
         setLoading(true);
         setError(null);
-        const resp = await api.get('/public/posts/featured');
+        const resp = await api.get('/api/public/posts/featured');
         if (resp.data?.post) {
           setFeaturedPost(resp.data.post);
         }

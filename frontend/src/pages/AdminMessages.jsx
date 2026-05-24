@@ -31,7 +31,7 @@ const AdminMessages = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await api.get('/messages', {
+      const resp = await api.get('/api/messages', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -52,7 +52,7 @@ const AdminMessages = () => {
   // Fetch replies when a message is selected
   const fetchReplies = useCallback(async (messageId) => {
     try {
-      const resp = await axios.get(`/api/messages/${messageId}/replies`, {
+      const resp = await api.get(`/api/messages/${messageId}/replies`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setReplies(resp.data?.replies || []);
@@ -73,7 +73,7 @@ const AdminMessages = () => {
 
   const handleMarkRead = async (id) => {
     try {
-      await axios.patch(`/api/messages/${id}/read`, {}, {
+      await api.patch(`/api/messages/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -88,7 +88,7 @@ const AdminMessages = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.put(`/api/messages/${id}`, { status: newStatus }, {
+      await api.put(`/api/messages/${id}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -107,7 +107,7 @@ const AdminMessages = () => {
 
     try {
       setSendingReply(true);
-      const resp = await axios.post(`/api/messages/${selectedMessage.id}/reply`, {
+      const resp = await api.post(`/api/messages/${selectedMessage.id}/reply`, {
         reply_text: replyText.trim(),
       }, {
         headers: { Authorization: `Bearer ${authToken}` },
@@ -128,7 +128,7 @@ const AdminMessages = () => {
 
     try {
       setDeletingId(id);
-      await axios.delete(`/api/messages/${id}`, {
+      await api.delete(`/api/messages/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

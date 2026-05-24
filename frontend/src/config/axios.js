@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.DEV
-  ? 'http://localhost:5000'
-  : 'https://social-cultural-server.vercel.app';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_URL || BASE_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -24,4 +23,4 @@ api.interceptors.request.use(
 );
 
 export default api;
-export { BASE_URL };
+export { BASE_URL, IMAGE_BASE_URL };

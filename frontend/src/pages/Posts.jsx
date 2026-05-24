@@ -27,7 +27,7 @@ const Posts = () => {
     setPostsError('');
 
     try {
-      const resp = await api.get('/posts', {
+      const resp = await api.get('/api/posts', {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -93,7 +93,7 @@ const Posts = () => {
     if (!ok) return;
 
     try {
-      await axios.delete(`/api/posts/${article.id}`, {
+      await api.delete(`/api/posts/${article.id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -112,7 +112,7 @@ const Posts = () => {
     try {
       setPostsError('');
 
-      await axios.put(
+      await api.put(
         `/api/posts/${article.id}`,
         {
           title: article.title,

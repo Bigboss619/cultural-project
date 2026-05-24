@@ -77,10 +77,10 @@ const TestimonialForm = ({ testimonial, onSuccess, onCancel }) => {
       };
 
       if (isEditing) {
-        await axios.put(`/api/testimonials/${testimonial.id}`, formPayload, { headers });
+        await api.put(`/api/testimonials/${testimonial.id}`, formPayload, { headers });
         showSuccess('Testimonial updated successfully');
       } else {
-        await api.post('/testimonials', formPayload, { headers });
+        await api.post('/api/testimonials', formPayload, { headers });
         showSuccess('Testimonial created successfully');
       }
 
@@ -233,7 +233,7 @@ const AdminTestimonial = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await api.get('/testimonials', {
+      const resp = await api.get('/api/testimonials', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -256,7 +256,7 @@ const AdminTestimonial = () => {
 
     try {
       setDeletingId(testimonialId);
-      await axios.delete(`/api/testimonials/${testimonialId}`, {
+      await api.delete(`/api/testimonials/${testimonialId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

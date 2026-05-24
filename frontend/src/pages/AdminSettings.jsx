@@ -38,7 +38,7 @@ const AdminSettings = () => {
 
   const fetchSettings = async () => {
     try {
-      const resp = await api.get('/settings', {
+      const resp = await api.get('/api/settings', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -108,7 +108,7 @@ const AdminSettings = () => {
     }
 
     try {
-      await api.put('/settings', formData, {
+      await api.put('/api/settings', formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

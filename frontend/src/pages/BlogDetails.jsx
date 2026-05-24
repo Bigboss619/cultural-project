@@ -132,7 +132,7 @@ const CommentSection = ({ postId }) => {
 
   const fetchComments = async () => {
     try {
-      const resp = await axios.get(`/api/public/comments/${postId}`);
+      const resp = await api.get(`/api/public/comments/${postId}`);
       setComments(resp.data.comments || []);
     } catch (err) {
       console.error('Failed to fetch comments:', err);
@@ -149,7 +149,7 @@ const CommentSection = ({ postId }) => {
     setSubmitting(true);
 
     try {
-      await api.post('/public/comments', {
+      await api.post('/api/public/comments', {
         post_id: postId,
         author_name: name,
         author_email: email,
@@ -346,7 +346,7 @@ const Details = () => {
       try {
         setLoading(true);
         setError(null);
-        const resp = await axios.get(`/api/public/posts/slug/${slug}`);
+        const resp = await api.get(`/api/public/posts/slug/${slug}`);
 
         if (resp.data?.post) {
           setPost(resp.data.post);

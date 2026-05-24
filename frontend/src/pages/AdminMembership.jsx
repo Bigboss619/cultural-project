@@ -17,7 +17,7 @@ const AdminMembership = () => {
 
   const fetchMembers = async () => {
     try {
-      const resp = await api.get('/members', {
+      const resp = await api.get('/api/members', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setMembers(resp.data.members || []);
@@ -87,14 +87,14 @@ const AdminMembership = () => {
 
     try {
       if (editingMember) {
-        await axios.put(`${API_BASE}/${editingMember.id}`, submitData, {
+        await api.put(`/api/members/${editingMember.id}`, submitData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'multipart/form-data',
           },
         });
       } else {
-        await api.post('/members', submitData, {
+        await api.post('/api/members', submitData, {
           headers: {
             Authorization: `Bearer ${authToken}`,
             'Content-Type': 'multipart/form-data',
@@ -118,7 +118,7 @@ const AdminMembership = () => {
     }
 
     try {
-      await axios.delete(`${API_BASE}/${id}`, {
+      await api.delete(`/api/members/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setDeleteConfirm(null);

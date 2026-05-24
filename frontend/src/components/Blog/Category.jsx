@@ -161,7 +161,7 @@ const Category = () => {
       setError(null);
 
       const params = categoryId && categoryId !== 'all' ? { category_id: categoryId } : {};
-      const resp = await api.get('/public/posts', { params });
+      const resp = await api.get('/api/public/posts', { params });
 
       const postsData = resp.data?.posts || [];
       setPosts(postsData);

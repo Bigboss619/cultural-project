@@ -63,7 +63,7 @@ const Categories = () => {
           return;
         }
 
-        const resp = await api.get('/categories', {
+        const resp = await api.get('/api/categories', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -107,7 +107,7 @@ const Categories = () => {
   };
 
   const refreshCategories = async () => {
-    const resp = await api.get('/categories', {
+    const resp = await api.get('/api/categories', {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -131,7 +131,7 @@ const Categories = () => {
 
       if (editId == null) {
         await api.post(
-          '/categories',
+          '/api/categories',
           { name, description },
           {
             headers: {
@@ -141,7 +141,7 @@ const Categories = () => {
         );
       } else {
         await api.put(
-          `/categories/${editId}`,
+          `/api/categories/${editId}`,
           { name, description },
           {
             headers: {
@@ -173,7 +173,7 @@ const Categories = () => {
       setLoading(true);
       setError('');
 
-      await api.delete(`/categories/${cat.id}`, {
+      await api.delete(`/api/categories/${cat.id}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

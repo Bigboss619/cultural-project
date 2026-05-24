@@ -18,7 +18,7 @@ const PaymentCallback = () => {
       }
 
       try {
-        const resp = await api.get(`/payments/verify/${reference}`);
+        const resp = await api.get(`/api/payments/verify/${reference}`);
         const data = resp.data.data;
 
         if (data.status === 'success') {

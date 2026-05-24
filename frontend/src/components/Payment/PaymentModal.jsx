@@ -26,7 +26,7 @@ const PaymentModal = ({ isOpen, onClose, amount, description = 'Membership Payme
     setError('');
 
     try {
-      const response = await api.post('/payments/initialize', {
+      const response = await api.post('/api/payments/initialize', {
         email: email.trim(),
         amount: amount,
         customer_name: name.trim(),

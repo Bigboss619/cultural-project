@@ -102,7 +102,7 @@ const Users = () => {
         setLoading(true);
         setError('');
 
-        const resp = await api.get('/users', {
+        const resp = await api.get('/api/users', {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },

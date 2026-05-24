@@ -22,8 +22,8 @@ const AdminPayment = () => {
       if (statusFilter) params.append('status', statusFilter);
 
       const [paymentsResp, statsResp] = await Promise.all([
-        axios.get(`/api/payments?${params}`, { headers: { Authorization: `Bearer ${authToken}` } }),
-        api.get('/payments/stats', { headers: { Authorization: `Bearer ${authToken}` } })
+        api.get(`/api/payments?${params}`, { headers: { Authorization: `Bearer ${authToken}` } }),
+        api.get('/api/payments/stats', { headers: { Authorization: `Bearer ${authToken}` } })
       ]);
 
       setPayments(paymentsResp.data.payments || []);

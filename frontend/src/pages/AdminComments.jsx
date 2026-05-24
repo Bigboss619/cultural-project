@@ -28,7 +28,7 @@ const AdminComments = () => {
       setLoading(true);
       setError(null);
 
-      const resp = await api.get('/comments', {
+      const resp = await api.get('/api/comments', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -49,7 +49,7 @@ const AdminComments = () => {
   const handleApprove = async (id, approved) => {
     try {
       setModeratingId(id);
-      await api.patch(`/comments/${id}/approve`, { approved }, {
+      await api.patch(`/api/comments/${id}/approve`, { approved }, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -67,7 +67,7 @@ const AdminComments = () => {
 
     try {
       setDeletingId(id);
-      await api.delete(`/comments/${id}`, {
+      await api.delete(`/api/comments/${id}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 

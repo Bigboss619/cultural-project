@@ -43,7 +43,7 @@ const AdminProfilePage = () => {
     try {
       setLoading(true);
       setError(null);
-      const resp = await api.get('/auth/me', {
+      const resp = await api.get('/api/auth/me', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -79,7 +79,7 @@ const AdminProfilePage = () => {
 
     try {
       setSaving(true);
-      const resp = await api.put('/auth/profile', {
+      const resp = await api.put('/api/auth/profile', {
         name: profileForm.name,
         phone: profileForm.phone,
         bio: profileForm.bio,
@@ -118,7 +118,7 @@ const AdminProfilePage = () => {
 
     try {
       setSaving(true);
-      await api.put('/auth/change-password', {
+      await api.put('/api/auth/change-password', {
         currentPassword: passwordForm.currentPassword,
         newPassword: passwordForm.newPassword,
       }, {

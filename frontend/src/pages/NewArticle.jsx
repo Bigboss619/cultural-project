@@ -52,7 +52,7 @@ const NewArticle = () => {
       setCategoriesLoading(true);
       setCategoriesError('');
 
-      const resp = await api.get('/categories', {
+      const resp = await api.get('/api/categories', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -73,7 +73,7 @@ const NewArticle = () => {
     try {
       setFormError('');
 
-      const resp = await api.get(`/posts/${postId}`, {
+      const resp = await api.get(`/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${authToken}` },
       });
 
@@ -199,11 +199,11 @@ const NewArticle = () => {
 
     try {
       if (isEdit) {
-        await api.put(`/posts/${id}`, payload, {
+        await api.put(`/api/posts/${id}`, payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
       } else {
-        await api.post('/posts', payload, {
+        await api.post('/api/posts', payload, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
       }

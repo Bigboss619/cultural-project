@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './SignupForm.css';
 import axios from 'axios';
 import API_URL from '../../config/api';
+import api from '../../config/axios';
 
 const validateEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -136,7 +137,7 @@ export default function SignupForm() {
 
     try {
       // const response = await axios.post(`${API_BASE}/api/auth/register`, {
-      const response = await axios.post(`${API_URL}/auth/register`, {
+      const response = await api.post('/auth/register', {
         // backend expects `name`, not `fullName`
         name: formData.fullName,
         email: formData.email,

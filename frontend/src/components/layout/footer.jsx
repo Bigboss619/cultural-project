@@ -12,7 +12,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const resp = await api.get('/public/settings');
+        const resp = await api.get('/api/public/settings');
         const data = resp.data.settings || {};
         setSocialLinks({
           social_facebook: data.social_facebook || '#',
